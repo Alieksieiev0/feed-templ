@@ -1,0 +1,48 @@
+package auth
+
+import "github.com/Alieksieiev0/feed-templ/internal/view/core"
+
+const (
+	emailInput      = "email"
+	nameInput       = "username"
+	nameComplete    = "nickname"
+	nameType        = "text"
+	passCompleteNew = "new-password"
+	buttonType      = "submit"
+)
+
+templ Signup() {
+	<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+		<div class="sm:mx-auto sm:w-full sm:max-w-sm">
+			<img class="mx-auto h-10 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=primary&shade=600" alt="GoFeed"/>
+			<h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Sign up to your account</h2>
+		</div>
+		<div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+			@SignupForm()
+		</div>
+	</div>
+}
+
+templ SignupForm() {
+	@core.CreationForm(
+		"/signup",
+		"this",
+		"innerHTML",
+		core.Button("Sign Up", core.DefaultButton(buttonType)),
+		core.Input(
+			"Name",
+			core.DefaultLabel(nameInput),
+			core.DefaultRequiredInput(nameInput, nameType, nameComplete),
+		),
+		core.Input(
+			"Email",
+			core.DefaultLabel(emailInput),
+			core.DefaultRequiredInput(emailInput, emailInput, emailInput),
+		),
+		core.Input(
+			"Password",
+			core.DefaultLabel(passInput),
+			core.DefaultRequiredInput(passInput, passInput, passCompleteNew),
+		),
+	)
+}

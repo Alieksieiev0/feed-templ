@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 
 [build]
 bin = "./tmp/main"
-cmd = "templ generate && go build -o ./tmp/main ./cmd/feed-templ/main.go"
+cmd = "make tail && make templ && go build -o ./tmp/main ./cmd/feed-templ/main.go"
 delay = 1000
 exclude_dir = ["assets", "tmp", "vendor"]
 exclude_file = []

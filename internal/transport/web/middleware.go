@@ -9,5 +9,5 @@ import (
 )
 
 func NotFoundMiddleware(c *fiber.Ctx) error {
-	return render(c, core.NotFound(), templ.WithStatus(http.StatusNotFound))
+	return Render(c, core.NotFound(), templ.WithStatus(http.StatusNotFound))
 }

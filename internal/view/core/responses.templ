@@ -1,0 +1,15 @@
+package core
+
+templ Error(err string) {
+	<div id="error">
+		<p id="error-msg" class="mt-10 text-center text-xl font-semibold leading-9 tracking-tight text-red-700">
+			{ err }
+		</p>
+	</div>
+}
+
+templ Success(title, linkTitle string, link templ.SafeURL) {
+	<div class="block text-sm font-medium leading-6 text-gray-900">
+		{ title } <a href={ link } class="font-semibold leading-6 text-primary-600 hover:text-primary-500">{ linkTitle }</a>
+	</div>
+}
