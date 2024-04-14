@@ -30,25 +30,22 @@ type Pagination struct {
 
 func homeHandler(serv services.FeedService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		posts, statusCode, err := serv.GetRecent(
-			c.Context(),
-			c.Cookies("jwt"),
-			fmt.Sprint(postsStep),
-			"0",
-		)
-		fmt.Printf("slice: %q", posts)
-		if statusCode == fiber.StatusUnauthorized {
-			clearCookies(c)
-			redirect(c, "/signin", statusCode)
-			return nil
-		}
+		posts, statusCode, err := serv.GetRecentPosts(c.Context(), fmt.Sprint(postsStep), "0")
 
 		if err != nil {
-			return render(c, baseWithAuth(c, pages.ServerError("Error: "+err.Error())))
+			return render(
+				c,
+				baseWithAuth(c, pages.ServerError("Error: "+err.Error())),
+				templ.WithStatus(statusCode),
+			)
 		}
 
 		setLimitOffsetCookies(c, fmt.Sprint(postsStep*2), fmt.Sprint(postsStep))
-		return render(c, baseWithAuth(c, pages.Home(isLoggedIn(c), posts)))
+		return render(
+			c,
+			baseWithAuth(c, pages.Home(isLoggedIn(c), posts)),
+			templ.WithStatus(statusCode),
+		)
 	}
 }
 
@@ -133,17 +130,11 @@ func getPostsHandler(serv services.FeedService) fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + settingsErr))
 		}
 
-		posts, statusCode, err := serv.GetRecent(
+		posts, statusCode, err := serv.GetRecentPosts(
 			c.Context(),
-			c.Cookies("jwt"),
 			fmt.Sprint(limit),
 			fmt.Sprint(offset),
 		)
-		if statusCode == fiber.StatusUnauthorized {
-			clearCookies(c)
-			redirect(c, "/signin", statusCode)
-			return nil
-		}
 
 		if err != nil {
 			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))

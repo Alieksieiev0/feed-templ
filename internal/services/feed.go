@@ -16,7 +16,7 @@ const (
 )
 
 type FeedService interface {
-	GetRecent(c context.Context, token, limit, offset string) ([]types.Post, int, error)
+	GetRecentPosts(c context.Context, limit, offset string) ([]types.Post, int, error)
 	Post(c context.Context, userId, token string, post *types.Post) (int, error)
 }
 
@@ -30,16 +30,15 @@ type feedService struct {
 	addr string
 }
 
-func (fs *feedService) GetRecent(
+func (fs *feedService) GetRecentPosts(
 	c context.Context,
-	token, limit, offset string,
+	limit, offset string,
 ) ([]types.Post, int, error) {
 	req, err := createRequest(c, http.MethodGet, fs.addr+postsURL, nil)
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
 	}
 
-	req.Header.Add("Authorization", token)
 	q := req.URL.Query()
 	q.Add("limit", limit)
 	q.Add("offset", offset)
