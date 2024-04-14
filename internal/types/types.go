@@ -7,11 +7,17 @@ type UserToken struct {
 	Token Token `json:"token"`
 }
 
-type User struct {
+type UserBase struct {
 	Id       string `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
-	Password string `json:"password"`
+}
+
+type User struct {
+	UserBase
+	Password    string     `json:"password"`
+	Posts       []Post     `json:"posts"`
+	Subscribers []UserBase `json:"subscribers"`
 }
 
 type Token struct {

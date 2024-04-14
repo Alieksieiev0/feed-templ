@@ -22,7 +22,8 @@ func main() {
 	s := web.NewWebServer(fiber.New(), *webServerAddr)
 	authServ := services.NewAuthService(*apiAddr)
 	feedServ := services.NewFeedService(*apiAddr)
-	err := s.Start(authServ, feedServ)
+	userServ := services.NewUserService(*apiAddr)
+	err := s.Start(authServ, feedServ, userServ)
 	if err != nil {
 		log.Fatal(err)
 	}

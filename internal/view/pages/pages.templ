@@ -12,12 +12,24 @@ templ Home(isLoggedIn bool, posts []types.Post) {
 	</div>
 }
 
+templ Search() {
+	<input
+		type="text"
+		name="username"
+		hx-get="/users"
+		hx-trigger="keyup changed delay:100ms"
+		hx-target="#search-results"
+		placeholder="Search..."
+	/>
+	<div id="search-results"></div>
+}
+
 templ NotFound() {
 	<div>Not Found!</div>
 }
 
 templ ServerError(err string) {
-	<div class="block text-lg text-center">
+	<div class="block text-3xl text-center">
 		Server Error
 		@core.Error(err)
 	</div>

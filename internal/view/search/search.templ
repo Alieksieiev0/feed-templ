@@ -1,13 +1,11 @@
 package search
 
-templ Search() {
-	<input
-		type="text"
-		name="search"
-		hx-get="/trigger_delay"
-		hx-trigger="keyup changed delay:500ms"
-		hx-target="#search-results"
-		placeholder="Search..."
-	/>
-	<div id="search-results"></div>
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+
+templ Results(users []types.User) {
+	for _, u := range users {
+		<div>
+			{ u.Username }
+		</div>
+	}
 }

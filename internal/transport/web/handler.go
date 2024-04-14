@@ -9,6 +9,7 @@ import (
 	"github.com/Alieksieiev0/feed-templ/internal/view/core"
 	"github.com/Alieksieiev0/feed-templ/internal/view/feed"
 	"github.com/Alieksieiev0/feed-templ/internal/view/pages"
+	"github.com/Alieksieiev0/feed-templ/internal/view/search"
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 )
@@ -47,6 +48,10 @@ func homeHandler(serv services.FeedService) fiber.Handler {
 			templ.WithStatus(statusCode),
 		)
 	}
+}
+
+func searchPage(c *fiber.Ctx) error {
+	return render(c, baseWithAuth(c, pages.Search()))
 }
 
 func signinPage(c *fiber.Ctx) error {
@@ -152,5 +157,27 @@ func getPostsHandler(serv services.FeedService) fiber.Handler {
 		setLimitOffsetCookies(c, fmt.Sprint(limit+postsStep), fmt.Sprint(offset+postsStep))
 		c.Set("HX-Reswap", "beforeend")
 		return render(c, feed.Posts(posts), templ.WithStatus(statusCode))
+	}
+}
+
+func getUsersHandler(serv services.UserService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		username := c.FormValue("username")
+		if username == "" {
+			return render(c, search.Results([]types.User{}), templ.WithStatus(fiber.StatusOK))
+		}
+
+		users, statusCode, err := serv.Search(
+			c.Context(),
+			username,
+			"10",
+			"0",
+		)
+
+		if err != nil {
+			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
+		}
+
+		return render(c, search.Results(users), templ.WithStatus(statusCode))
 	}
 }
