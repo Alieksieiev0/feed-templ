@@ -13,3 +13,9 @@ templ Success(title, linkTitle string, link templ.SafeURL) {
 		{ title } <a href={ link } class="font-semibold leading-6 text-primary-600 hover:text-primary-500">{ linkTitle }</a>
 	</div>
 }
+
+templ Warning(msg string) {
+	<div class="text-center text-xl font-semibold leading-9 tracking-tight">
+		{ msg }
+	</div>
+}

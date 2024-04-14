@@ -1,24 +1,52 @@
 package web
 
 import (
+	"fmt"
+
 	"github.com/Alieksieiev0/feed-templ/internal/services"
 	"github.com/Alieksieiev0/feed-templ/internal/types"
 	"github.com/Alieksieiev0/feed-templ/internal/view/auth"
 	"github.com/Alieksieiev0/feed-templ/internal/view/core"
-	"github.com/Alieksieiev0/feed-templ/internal/view/layout"
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
 const (
-	title     = "Congratulations! Registration successfully completed. You're all set to explore and engage with our platform."
-	link      = "/signin"
-	linkTitle = "Click here to login."
+	title             = "Congratulations! Registration successfully completed. You're all set to explore and engage with our platform."
+	link              = "/signin"
+	linkTitle         = "Click here to login."
+	settingsErr       = "bad settings were found while preparing to load posts"
+	incorrectCredsErr = "incorrect credentials were provided"
+	badDataErr        = "bad data was provided"
+	postsStep         = 10
 )
 
-func homePage(c *fiber.Ctx) error {
-	return render(c, baseWithAuth(c, core.Home(isLoggedIn(c), []types.Post{})))
+type Pagination struct {
+	Limit  int
+	Offset int
+}
+
+func homeHandler(serv services.FeedService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		posts, statusCode, err := serv.GetRecent(
+			c.Context(),
+			c.Cookies("jwt"),
+			fmt.Sprint(postsStep),
+			"0",
+		)
+		if statusCode == fiber.StatusUnauthorized {
+			clearCookies(c)
+			redirect(c, "/signin", statusCode)
+			return nil
+		}
+
+		if err != nil {
+			return render(c, baseWithAuth(c, core.ServerError("Error: "+err.Error())))
+		}
+
+		setLimitOffsetCookies(c, fmt.Sprint(postsStep*2), fmt.Sprint(postsStep))
+		return render(c, baseWithAuth(c, core.Home(isLoggedIn(c), posts)))
+	}
 }
 
 func signinPage(c *fiber.Ctx) error {
@@ -33,8 +61,7 @@ func signupHandler(serv services.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := &types.User{}
 		if err := c.BodyParser(user); err != nil {
-			return c.Status(fiber.StatusBadRequest).
-				Send([]byte("Error: incorrect credentials were provided"))
+			return c.Status(fiber.StatusBadRequest).Send([]byte("Error: " + incorrectCredsErr))
 		}
 
 		statusCode, err := serv.Register(c.Context(), user)
@@ -54,8 +81,7 @@ func signinHandler(serv services.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := &types.User{}
 		if err := c.BodyParser(user); err != nil {
-			return c.Status(fiber.StatusBadRequest).
-				Send([]byte("Error: incorrect credentials were provided"))
+			return c.Status(fiber.StatusBadRequest).Send([]byte("Error: " + incorrectCredsErr))
 		}
 
 		userToken, statusCode, err := serv.Login(c.Context(), user)
@@ -63,30 +89,22 @@ func signinHandler(serv services.AuthService) fiber.Handler {
 			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
 		}
 
-		setCookies(c, userToken)
-		c.Set("HX-Redirect", "/")
-		c.Status(statusCode)
-
+		setUserTokenCookies(c, userToken)
+		redirect(c, "/", statusCode)
 		return nil
 	}
 }
 
-func postsHandler(serv services.FeedService) fiber.Handler {
+func createPostHandler(serv services.FeedService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		post := &types.Post{}
 		if err := c.BodyParser(post); err != nil {
-			return c.Status(fiber.StatusBadRequest).
-				Send([]byte("Error: bad data was provided"))
+			return c.Status(fiber.StatusBadRequest).Send([]byte("Error: " + badDataErr))
 		}
 
-		token := c.Cookies("jwt")
-		if token == "" {
-			redirect(c, "/signin", fiber.StatusBadRequest)
-			return nil
-		}
-
-		statusCode, err := serv.Post(c.Context(), token, post)
+		statusCode, err := serv.Post(c.Context(), c.Cookies("id"), c.Cookies("jwt"), post)
 		if statusCode == fiber.StatusUnauthorized {
+			clearCookies(c)
 			redirect(c, "/signin", statusCode)
 			return nil
 		}
@@ -95,62 +113,50 @@ func postsHandler(serv services.FeedService) fiber.Handler {
 			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
 		}
 
-		c.Set("HX-Reswap", "beforebegin")
+		c.Set("HX-Reswap", "afterbegin")
 		return render(c, core.Post(*post), templ.WithStatus(statusCode))
 	}
 }
 
-func baseWithAuth(c *fiber.Ctx, contents templ.Component) templ.Component {
-	return layout.Base(isLoggedIn(c), contents)
-}
+func getPostsHandler(serv services.FeedService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		limit, err := getIntCookie(c, "limit", "10")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + settingsErr))
+		}
 
-func isLoggedIn(c *fiber.Ctx) bool {
-	return c.Cookies("jwt") != ""
-}
+		offset, err := getIntCookie(c, "offset", "0")
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + settingsErr))
+		}
 
-func redirect(c *fiber.Ctx, url string, statusCode int) {
-	c.Set("HX-Redirect", "/signin")
-	c.Status(fiber.StatusBadRequest)
-}
+		posts, statusCode, err := serv.GetRecent(
+			c.Context(),
+			c.Cookies("jwt"),
+			fmt.Sprint(limit),
+			fmt.Sprint(offset),
+		)
+		if statusCode == fiber.StatusUnauthorized {
+			clearCookies(c)
+			redirect(c, "/signin", statusCode)
+			return nil
+		}
 
-func setCookies(c *fiber.Ctx, userToken *types.UserToken) {
-	tokenCookie := &fiber.Cookie{
-		Name:        "jwt",
-		Value:       userToken.Token.Value,
-		SessionOnly: true,
+		if err != nil {
+			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
+		}
+
+		if len(posts) == 0 {
+			c.Set("HX-Retarget", "this")
+			c.Set("HX-Reswap", "outerHTML")
+			return render(
+				c,
+				core.Warning("All posts are already loaded"),
+				templ.WithStatus(statusCode),
+			)
+		}
+		setLimitOffsetCookies(c, fmt.Sprint(limit+postsStep), fmt.Sprint(offset+postsStep))
+		c.Set("HX-Reswap", "beforeend")
+		return render(c, core.Posts(posts), templ.WithStatus(statusCode))
 	}
-	c.Cookie(tokenCookie)
-
-	idCookie := &fiber.Cookie{
-		Name:        "id",
-		Value:       userToken.User.Id,
-		SessionOnly: true,
-	}
-	c.Cookie(idCookie)
-
-	usernameCookie := &fiber.Cookie{
-		Name:        "username",
-		Value:       userToken.User.Username,
-		SessionOnly: true,
-	}
-	c.Cookie(usernameCookie)
-
-	emailCookie := &fiber.Cookie{
-		Name:        "email",
-		Value:       userToken.User.Username,
-		SessionOnly: true,
-	}
-	c.Cookie(emailCookie)
-}
-
-func render(
-	c *fiber.Ctx,
-	component templ.Component,
-	options ...func(*templ.ComponentHandler),
-) error {
-	componentHandler := templ.Handler(component)
-	for _, o := range options {
-		o(componentHandler)
-	}
-	return adaptor.HTTPHandler(componentHandler)(c)
 }

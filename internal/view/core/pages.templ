@@ -13,3 +13,10 @@ templ Home(isLoggedIn bool, posts []types.Post) {
 templ NotFound() {
 	<div>Not Found!</div>
 }
+
+templ ServerError(err string) {
+	<div class="block text-lg text-center">
+		Server Error
+		@Error(err)
+	</div>
+}

@@ -10,16 +10,18 @@ import (
 )
 
 type WebServer struct {
-	app *fiber.App
+	app  *fiber.App
+	addr string
 }
 
-func NewWebServer(app *fiber.App) *WebServer {
+func NewWebServer(app *fiber.App, addr string) *WebServer {
 	return &WebServer{
-		app: app,
+		app:  app,
+		addr: addr,
 	}
 }
 
-func (ws *WebServer) Start(addr string, authServ services.AuthService) error {
+func (ws *WebServer) Start(authServ services.AuthService, feedServ services.FeedService) error {
 	ws.app.Use(logger.New(logger.Config{
 		Format: "${time} | ${status} | ${latency} | ${method} | ${path} | ${error}\nResponse Body: ${resBody}\n",
 	}))
@@ -30,12 +32,14 @@ func (ws *WebServer) Start(addr string, authServ services.AuthService) error {
 		Browse:     true,
 	}))
 
-	ws.app.Get("/", homePage)
+	ws.app.Get("/", homeHandler(feedServ))
 	ws.app.Get("/signup", signupPage)
 	ws.app.Get("/signin", signinPage)
+	ws.app.Get("/posts", getPostsHandler(feedServ))
 	ws.app.Post("/signup", signupHandler(authServ))
 	ws.app.Post("/signin", signinHandler(authServ))
+	ws.app.Post("/posts", createPostHandler(feedServ))
 	ws.app.Use(NotFoundMiddleware)
 
-	return ws.app.Listen(addr)
+	return ws.app.Listen(ws.addr)
 }

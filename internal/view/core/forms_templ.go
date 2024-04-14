@@ -23,14 +23,14 @@ func CreationForm(url, target, swap string, button templ.Component, inputs ...te
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-ext=\"response-targets\"><form class=\"space-y-6\" hx-post=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form class=\"space-y-6\" hx-post=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(url)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 5, Col: 39}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 4, Col: 38}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
@@ -43,7 +43,7 @@ func CreationForm(url, target, swap string, button templ.Component, inputs ...te
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(swap)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 5, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 4, Col: 55}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -56,7 +56,7 @@ func CreationForm(url, target, swap string, button templ.Component, inputs ...te
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(target)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 5, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 4, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -80,7 +80,7 @@ func CreationForm(url, target, swap string, button templ.Component, inputs ...te
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"test\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,11 +88,15 @@ func CreationForm(url, target, swap string, button templ.Component, inputs ...te
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></form></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = Error("").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -131,7 +135,7 @@ func Button(label string, attrs templ.Attributes) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 20, Col: 287}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 18, Col: 287}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -180,7 +184,7 @@ func Input(label string, labelAttrs, inputAttrs templ.Attributes) templ.Componen
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 28, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 26, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -209,14 +213,18 @@ func DefaultLabel(labelFor string) templ.Attributes {
 	return templ.Attributes{"for": labelFor}
 }
 
-func DefaultRequiredInput(name, inputType, automcomplete string) templ.Attributes {
-	attrs := DefaultInput(name, inputType, automcomplete)
+func DefaultRequiredInput(name, inputType string, automcomplete ...string) templ.Attributes {
+	attrs := DefaultInput(name, inputType, automcomplete...)
 	attrs["required"] = true
 	return attrs
 }
 
-func DefaultInput(name, inputType, autocomplete string) templ.Attributes {
-	return templ.Attributes{"id": name, "name": name, "type": inputType, "autocomplete": autocomplete}
+func DefaultInput(name, inputType string, autocomplete ...string) templ.Attributes {
+	attrs := templ.Attributes{"id": name, "name": name, "type": inputType}
+	if len(autocomplete) > 0 {
+		attrs["autocomplete"] = autocomplete
+	}
+	return attrs
 }
 
 func TextArea(label string, labelAttrs, textAreaAttrs templ.Attributes) templ.Component {
@@ -247,7 +255,7 @@ func TextArea(label string, labelAttrs, textAreaAttrs templ.Attributes) templ.Co
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 49, Col: 91}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/core/forms.templ`, Line: 51, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {

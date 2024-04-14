@@ -9,24 +9,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const (
-	registerURL = "/api/auth/register"
-	loginURL    = "/api/auth/login"
-)
-
 func main() {
 	var (
 		webServerAddr = flag.String("web-server", ":3005", "listen address of web server")
 		apiAddr       = flag.String(
-			"auth-service",
+			"api",
 			"http://localhost:8080",
-			"address of auth service",
+			"api address",
 		)
 	)
 
-	s := web.NewWebServer(fiber.New())
-	authServ := services.NewAuthService(*apiAddr, registerURL, loginURL)
-	err := s.Start(*webServerAddr, authServ)
+	s := web.NewWebServer(fiber.New(), *webServerAddr)
+	authServ := services.NewAuthService(*apiAddr)
+	feedServ := services.NewFeedService(*apiAddr)
+	err := s.Start(authServ, feedServ)
 	if err != nil {
 		log.Fatal(err)
 	}

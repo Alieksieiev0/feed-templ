@@ -4,9 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
 	"github.com/gofiber/fiber/v2"
+)
+
+const (
+	registerURL = "/api/auth/register"
+	loginURL    = "/api/auth/login"
 )
 
 type AuthService interface {
@@ -14,38 +20,49 @@ type AuthService interface {
 	Login(c context.Context, user *types.User) (*types.UserToken, int, error)
 }
 
-func NewAuthService(addr, registerURL, loginURL string) AuthService {
+func NewAuthService(addr string) AuthService {
 	return &authService{
-		addr:        addr,
-		registerURL: registerURL,
-		loginURL:    loginURL,
+		addr: addr,
 	}
 }
 
 type authService struct {
-	addr        string
-	registerURL string
-	loginURL    string
+	addr string
 }
 
 func (as *authService) Register(c context.Context, user *types.User) (int, error) {
-	resp, err := SendRequest(c, as.addr+as.registerURL, user)
+	req, err := createRequest(c, http.MethodPost, as.addr+registerURL, user)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldn`t process provided credentials")
+		return fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided credentials")
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fiber.StatusInternalServerError, fmt.Errorf(
+			"couldnt register user with provided credentials",
+		)
 	}
 
 	if resp.StatusCode == fiber.StatusCreated {
 		return resp.StatusCode, nil
 	}
 
-	return resp.StatusCode, ReadResponseError(resp)
+	return resp.StatusCode, readResponseError(resp)
 }
 
 func (as *authService) Login(c context.Context, user *types.User) (*types.UserToken, int, error) {
-	resp, err := SendRequest(c, as.addr+as.loginURL, user)
+	req, err := createRequest(c, http.MethodPost, as.addr+loginURL, user)
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, fmt.Errorf(
 			"couldn`t process provided credentials",
+		)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	fmt.Println(err)
+	if err != nil {
+		return nil, fiber.StatusInternalServerError, fmt.Errorf(
+			"couldnt login user with provided credentials",
 		)
 	}
 
@@ -53,10 +70,10 @@ func (as *authService) Login(c context.Context, user *types.User) (*types.UserTo
 		userToken := &types.UserToken{}
 		err = json.NewDecoder(resp.Body).Decode(userToken)
 		if err != nil {
-			return nil, fiber.StatusInternalServerError, fmt.Errorf("couldn`t verify credentials")
+			return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt verify credentials")
 		}
 		return userToken, resp.StatusCode, nil
 	}
 
-	return nil, resp.StatusCode, ReadResponseError(resp)
+	return nil, resp.StatusCode, readResponseError(resp)
 }

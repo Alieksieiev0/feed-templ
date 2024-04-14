@@ -19,7 +19,12 @@ templ Base(isLoggedIn bool, contents templ.Component) {
 		</head>
 		<body>
 			@header(isLoggedIn)
-			@contents
+			<div hx-ext="response-targets">
+				@contents
+			</div>
+			<div class="mt-6 text-center">
+				footer
+			</div>
 		</body>
 	</html>
 }

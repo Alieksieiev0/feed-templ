@@ -3,7 +3,9 @@ package core
 import "github.com/Alieksieiev0/feed-templ/internal/types"
 
 const (
-	contentInput     = "content"
+	titleInput       = "title"
+	titleType        = "text"
+	contentInput     = "body"
 	contentMaxLength = 200
 )
 
@@ -12,30 +14,54 @@ templ Feed(isLoggedIn bool, posts []types.Post) {
 		@PostForm()
 	} else {
 		<p class="mt-10 text-center text-sm text-gray-500">
-			<a href="/signup" class="font-semibold leading-6 text-primary-600 hover:text-primary-500">Sign in to post!</a>
+			<a href="/signin" class="font-semibold leading-6 text-primary-600 hover:text-primary-500">Sign in to post!</a>
 		</p>
 	}
-	<div id="posts">
-		for _, post := range posts {
-			<div>
-				@Post(post)
-			</div>
-		}
+	<div id="feed">
+		@PostsFeed(posts)
+		@Error("")
 	</div>
 }
 
 templ PostForm() {
 	@CreationForm(
 		"/posts",
-		"posts",
+		"#posts",
 		"innerHTML",
 		Button("Post", DefaultButton("submit")),
+		Input(
+			"Title",
+			DefaultLabel(titleInput),
+			DefaultRequiredInput(titleInput, titleType),
+		),
 		TextArea(
 			"Content",
 			DefaultLabel(contentInput),
 			DefaultRequiredTextArea(contentInput, contentMaxLength),
 		),
 	)
+}
+
+templ PostsFeed(posts []types.Post) {
+	<div id="posts">
+		@Posts(posts)
+	</div>
+	if len(posts) > 0 {
+		<button
+			class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+			hx-get="/posts"
+			hx-trigger="click"
+			hx-target="#posts"
+			hx-target="#error-msg"
+			hx-swap="innerHTML"
+		>Load More</button>
+	}
+}
+
+templ Posts(posts []types.Post) {
+	for _, post := range posts {
+		@Post(post)
+	}
 }
 
 templ Post(post types.Post) {

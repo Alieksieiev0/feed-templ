@@ -1,19 +1,17 @@
 package core
 
 templ CreationForm(url, target, swap string, button templ.Component, inputs ...templ.Component) {
-	<div hx-ext="response-targets">
-		<form class="space-y-6" hx-post={ url } hx-swap={ swap } hx-target={ target } hx-target-error="#error-msg">
-			for _, input := range inputs {
-				<div>
-					@input
-				</div>
-			}
+	<form class="space-y-6" hx-post={ url } hx-swap={ swap } hx-target={ target } hx-target-error="#error-msg">
+		for _, input := range inputs {
 			<div>
-				@button
+				@input
 			</div>
-		</form>
-	</div>
-	@Error("")
+		}
+		<div id="test">
+			@button
+		</div>
+		@Error("")
+	</form>
 }
 
 templ Button(label string, attrs templ.Attributes) {
@@ -35,14 +33,18 @@ func DefaultLabel(labelFor string) templ.Attributes {
 	return templ.Attributes{"for": labelFor}
 }
 
-func DefaultRequiredInput(name, inputType, automcomplete string) templ.Attributes {
-	attrs := DefaultInput(name, inputType, automcomplete)
+func DefaultRequiredInput(name, inputType string, automcomplete ...string) templ.Attributes {
+	attrs := DefaultInput(name, inputType, automcomplete...)
 	attrs["required"] = true
 	return attrs
 }
 
-func DefaultInput(name, inputType, autocomplete string) templ.Attributes {
-	return templ.Attributes{"id": name, "name": name, "type": inputType, "autocomplete": autocomplete}
+func DefaultInput(name, inputType string, autocomplete ...string) templ.Attributes {
+	attrs := templ.Attributes{"id": name, "name": name, "type": inputType}
+	if len(autocomplete) > 0 {
+		attrs["autocomplete"] = autocomplete
+	}
+	return attrs
 }
 
 templ TextArea(label string, labelAttrs, textAreaAttrs templ.Attributes) {
