@@ -1,0 +1,64 @@
+package feed
+
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+import "github.com/Alieksieiev0/feed-templ/internal/view/core"
+
+const (
+	titleInput       = "title"
+	titleType        = "text"
+	contentInput     = "body"
+	contentMaxLength = 200
+)
+
+templ PostForm() {
+	@core.CreationForm(
+		"/posts",
+		"#posts",
+		"innerHTML",
+		core.Button("Post", core.DefaultButton("submit")),
+		core.Input(
+			"Title",
+			core.DefaultLabel(titleInput),
+			core.DefaultRequiredInput(titleInput, titleType),
+		),
+		core.TextArea(
+			"Content",
+			core.DefaultLabel(contentInput),
+			core.DefaultRequiredTextArea(contentInput, contentMaxLength),
+		),
+	)
+}
+
+templ Posts(posts []types.Post) {
+	for _, post := range posts {
+		@Post(post)
+	}
+}
+
+templ Post(post types.Post) {
+	<div class="mb-4 shadow-xl break-inside p-6 rounded-xl bg-white dark:bg-slate-800 flex flex-col bg-clip-border">
+		<div class="flex pb-6 items-center justify-between">
+			<div class="flex">
+				<a class="inline-block mr-4" href="#">
+					<img class="rounded-full max-w-none w-14 h-14" src="https://randomuser.me/api/portraits/men/32.jpg"/>
+				</a>
+				<div class="flex flex-col">
+					<div class="flex items-center">
+						<a class="inline-block text-lg font-bold mr-2" href={ templ.SafeURL("/users/" + post.OwnerId) }>{ post.OwnerName }</a>
+					</div>
+					<div class="text-slate-500 dark:text-slate-300">
+						{ post.CreatedAt.Format("January 2, 2006") }
+					</div>
+				</div>
+			</div>
+		</div>
+		<h2 class="text-3xl font-extrabold">
+			{ post.Title }
+		</h2>
+		<div class="py-4">
+			<p>
+				{ post.Body }
+			</p>
+		</div>
+	</div>
+}

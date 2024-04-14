@@ -19,16 +19,16 @@ type Token struct {
 }
 
 type Base struct {
-	Id        string
-	CreatedAt time.Time
+	Id        string    `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type Post struct {
 	Base
-	Title     string
-	Body      string
-	OwnerName string
-	OwnerId   string
+	Title     string `json:"title"`
+	Body      string `json:"body"`
+	OwnerName string `json:"owner_name"`
+	OwnerId   string `json:"owner_id"`
 }
 
 type ResponseError struct {

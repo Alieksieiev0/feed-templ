@@ -1,0 +1,24 @@
+package pages
+
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+import "github.com/Alieksieiev0/feed-templ/internal/view/feed"
+import "github.com/Alieksieiev0/feed-templ/internal/view/core"
+
+templ Home(isLoggedIn bool, posts []types.Post) {
+	<div class="flex justify-center items-center">
+		<div class="w-1/3">
+			@feed.Feed(isLoggedIn, posts)
+		</div>
+	</div>
+}
+
+templ NotFound() {
+	<div>Not Found!</div>
+}
+
+templ ServerError(err string) {
+	<div class="block text-lg text-center">
+		Server Error
+		@core.Error(err)
+	</div>
+}

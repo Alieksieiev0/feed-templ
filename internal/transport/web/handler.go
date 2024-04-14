@@ -7,6 +7,8 @@ import (
 	"github.com/Alieksieiev0/feed-templ/internal/types"
 	"github.com/Alieksieiev0/feed-templ/internal/view/auth"
 	"github.com/Alieksieiev0/feed-templ/internal/view/core"
+	"github.com/Alieksieiev0/feed-templ/internal/view/feed"
+	"github.com/Alieksieiev0/feed-templ/internal/view/pages"
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 )
@@ -34,6 +36,7 @@ func homeHandler(serv services.FeedService) fiber.Handler {
 			fmt.Sprint(postsStep),
 			"0",
 		)
+		fmt.Printf("slice: %q", posts)
 		if statusCode == fiber.StatusUnauthorized {
 			clearCookies(c)
 			redirect(c, "/signin", statusCode)
@@ -41,11 +44,11 @@ func homeHandler(serv services.FeedService) fiber.Handler {
 		}
 
 		if err != nil {
-			return render(c, baseWithAuth(c, core.ServerError("Error: "+err.Error())))
+			return render(c, baseWithAuth(c, pages.ServerError("Error: "+err.Error())))
 		}
 
 		setLimitOffsetCookies(c, fmt.Sprint(postsStep*2), fmt.Sprint(postsStep))
-		return render(c, baseWithAuth(c, core.Home(isLoggedIn(c), posts)))
+		return render(c, baseWithAuth(c, pages.Home(isLoggedIn(c), posts)))
 	}
 }
 
@@ -114,7 +117,7 @@ func createPostHandler(serv services.FeedService) fiber.Handler {
 		}
 
 		c.Set("HX-Reswap", "afterbegin")
-		return render(c, core.Post(*post), templ.WithStatus(statusCode))
+		return render(c, feed.Post(*post), templ.WithStatus(statusCode))
 	}
 }
 
@@ -157,6 +160,6 @@ func getPostsHandler(serv services.FeedService) fiber.Handler {
 		}
 		setLimitOffsetCookies(c, fmt.Sprint(limit+postsStep), fmt.Sprint(offset+postsStep))
 		c.Set("HX-Reswap", "beforeend")
-		return render(c, core.Posts(posts), templ.WithStatus(statusCode))
+		return render(c, feed.Posts(posts), templ.WithStatus(statusCode))
 	}
 }

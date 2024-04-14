@@ -1,0 +1,30 @@
+package feed
+
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+import "github.com/Alieksieiev0/feed-templ/internal/view/core"
+
+templ Feed(isLoggedIn bool, posts []types.Post) {
+	if isLoggedIn {
+		@PostForm()
+	} else {
+		<p class="mt-10 text-center text-sm text-gray-500">
+			<a href="/signin" class="font-semibold leading-6 text-primary-600 hover:text-primary-500">Sign in to post!</a>
+		</p>
+	}
+	<div id="feed">
+		<div id="posts">
+			@Posts(posts)
+		</div>
+		if len(posts) > 0 {
+			<button
+				class="flex w-full justify-center rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+				hx-get="/posts"
+				hx-trigger="click"
+				hx-target="#posts"
+				hx-target="#error-msg"
+				hx-swap="innerHTML"
+			>Load More</button>
+		}
+		@core.Error("")
+	</div>
+}
