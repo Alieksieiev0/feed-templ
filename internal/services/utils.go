@@ -5,9 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
+	"github.com/fasthttp/websocket"
 )
 
 func readResponseError(resp *http.Response) error {
@@ -35,4 +38,27 @@ func createRequest(c context.Context, method, url string, v any) (*http.Request,
 	}
 	req.Header.Add("Content-Type", "application/json")
 	return req, nil
+}
+
+func createWebsocketRequest(host, path string) (*websocket.Conn, error) {
+	URL := url.URL{Scheme: "ws", Host: host, Path: path}
+	conn, _, err := websocket.DefaultDialer.Dial(URL.String(), nil)
+	return conn, err
+}
+
+func listenWebsocket[T any](conn *websocket.Conn, ch chan<- *T) error {
+	go func() {
+		defer close(ch)
+		for {
+			entity := new(T)
+			err := conn.ReadJSON(entity)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			ch <- entity
+		}
+	}()
+
+	return nil
 }

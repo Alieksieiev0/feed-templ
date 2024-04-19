@@ -3,9 +3,13 @@ package pages
 import "github.com/Alieksieiev0/feed-templ/internal/types"
 import "github.com/Alieksieiev0/feed-templ/internal/view/feed"
 import "github.com/Alieksieiev0/feed-templ/internal/view/core"
+import "github.com/Alieksieiev0/feed-templ/internal/view/notify"
 
-templ Home(isLoggedIn bool, posts []types.Post) {
+templ Home(isLoggedIn bool, posts []types.Post, notifications []types.Notification) {
 	<div class="flex justify-center items-center">
+		<div>
+			@notify.Notifications(notifications)
+		</div>
 		<div class="w-1/3">
 			@feed.Feed(isLoggedIn, posts)
 		</div>

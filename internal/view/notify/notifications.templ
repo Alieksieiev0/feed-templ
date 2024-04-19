@@ -1,0 +1,15 @@
+package notify
+
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+
+templ Notifications(notifications []types.Notification) {
+	for _, n := range notifications {
+		@Notification(n)
+	}
+}
+
+templ Notification(notification types.Notification) {
+	<div>
+		{ notification.Type } - { notification.Status }
+	</div>
+}

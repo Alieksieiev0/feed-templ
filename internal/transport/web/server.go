@@ -21,11 +21,7 @@ func NewWebServer(app *fiber.App, addr string) *WebServer {
 	}
 }
 
-func (ws *WebServer) Start(
-	authServ services.AuthService,
-	feedServ services.FeedService,
-	userSev services.UserService,
-) error {
+func (ws *WebServer) Start(serv services.Service) error {
 	ws.app.Use(logger.New(logger.Config{
 		Format: "${time} | ${status} | ${latency} | ${method} | ${path} | ${error}\nResponse Body: ${resBody}\n",
 	}))
@@ -36,16 +32,18 @@ func (ws *WebServer) Start(
 		Browse:     true,
 	}))
 
-	ws.app.Get("/", homeHandler(feedServ))
+	ws.app.Get("/", homeHandler(serv, serv))
 	ws.app.Get("/search", searchPage)
 	ws.app.Get("/signup", signupPage)
 	ws.app.Get("/signin", signinPage)
-	ws.app.Get("/posts", getPostsHandler(feedServ))
-	ws.app.Get("/users", getUsersHandler(userSev))
-	ws.app.Post("/signup", signupHandler(authServ))
-	ws.app.Post("/signin", signinHandler(authServ))
-	ws.app.Post("/posts", createPostHandler(feedServ))
-	ws.app.Post("/subscribe/:id", subscribeHandler(feedServ))
+	ws.app.Get("/posts", getPostsHandler(serv))
+	ws.app.Get("/users", getUsersHandler(serv))
+	ws.app.Get("/notifications", getNotificationsHandler(serv))
+	ws.app.Get("/notifications/listen", listenHandler(serv))
+	ws.app.Post("/signup", signupHandler(serv))
+	ws.app.Post("/signin", signinHandler(serv))
+	ws.app.Post("/posts", createPostHandler(serv))
+	ws.app.Post("/subscribe/:id", subscribeHandler(serv))
 	ws.app.Use(NotFoundMiddleware)
 
 	return ws.app.Listen(ws.addr)

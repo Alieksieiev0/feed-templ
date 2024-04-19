@@ -1,7 +1,10 @@
 package web
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
+	"log"
 	"slices"
 
 	"github.com/Alieksieiev0/feed-templ/internal/services"
@@ -9,10 +12,12 @@ import (
 	"github.com/Alieksieiev0/feed-templ/internal/view/auth"
 	"github.com/Alieksieiev0/feed-templ/internal/view/core"
 	"github.com/Alieksieiev0/feed-templ/internal/view/feed"
+	"github.com/Alieksieiev0/feed-templ/internal/view/notify"
 	"github.com/Alieksieiev0/feed-templ/internal/view/pages"
 	"github.com/Alieksieiev0/feed-templ/internal/view/search"
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
+	"github.com/valyala/fasthttp"
 )
 
 const (
@@ -30,9 +35,12 @@ type Pagination struct {
 	Offset int
 }
 
-func homeHandler(serv services.FeedService) fiber.Handler {
+func homeHandler(
+	feedServ services.FeedService,
+	notifServ services.NotificationServices,
+) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		posts, statusCode, err := serv.GetRecentPosts(c.Context(), fmt.Sprint(postsStep), "0")
+		posts, statusCode, err := feedServ.GetRecentPosts(c.Context(), fmt.Sprint(postsStep), "0")
 
 		if err != nil {
 			return render(
@@ -42,10 +50,23 @@ func homeHandler(serv services.FeedService) fiber.Handler {
 			)
 		}
 
+		id := c.Cookies("id")
+		notifications := []types.Notification{}
+		if id != "" {
+			notifications, statusCode, err = notifServ.Get(c.Context(), id)
+			if err != nil {
+				return render(
+					c,
+					baseWithAuth(c, pages.ServerError("Error: "+err.Error())),
+					templ.WithStatus(statusCode),
+				)
+			}
+		}
+
 		setLimitOffsetCookies(c, fmt.Sprint(postsStep*2), fmt.Sprint(postsStep))
 		return render(
 			c,
-			baseWithAuth(c, pages.Home(isLoggedIn(c), posts)),
+			baseWithAuth(c, pages.Home(isLoggedIn(c), posts, notifications)),
 			templ.WithStatus(statusCode),
 		)
 	}
@@ -226,11 +247,46 @@ func subscribeHandler(serv services.FeedService) fiber.Handler {
 	}
 }
 
-func getNotificationsHandler() fiber.Handler {
+func getNotificationsHandler(serv services.NotificationServices) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		notifications, statusCode, err := serv.Get(c.Context(), c.Cookies("id"))
+		if err != nil {
+			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
+		}
+
+		return render(c, notify.Notifications(notifications))
+	}
+}
+
+func listenHandler(serv services.NotificationServices) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
 		c.Set("Connection", "keep-alive")
+
+		ch := make(chan *types.Notification)
+		err := serv.Listen(c.Context(), c.Cookies("id"), ch)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+		}
+
+		c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
+			for {
+				notification := <-ch
+				err := json.NewEncoder(w).Encode(notification)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+
+				err = w.Flush()
+				if err != nil {
+					log.Println(err)
+					break
+				}
+			}
+		}))
+
 		return nil
 	}
 }

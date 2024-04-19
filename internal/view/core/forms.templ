@@ -1,6 +1,8 @@
 package core
 
 templ CreationForm(url, target, swap string, button templ.Component, inputs ...templ.Component) {
+	<script>
+    </script>
 	<form class="space-y-6" hx-post={ url } hx-swap={ swap } hx-target={ target } hx-target-error="#error-msg">
 		for _, input := range inputs {
 			<div>
