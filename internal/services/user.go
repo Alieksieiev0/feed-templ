@@ -32,7 +32,6 @@ func (us *userService) Search(
 	c context.Context,
 	query, limit, offset string,
 ) ([]types.User, int, error) {
-	fmt.Println(query)
 	req, err := createRequest(c, http.MethodGet, us.addr+usersUrl, nil)
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")

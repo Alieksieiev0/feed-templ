@@ -54,7 +54,7 @@ func (as *authService) Login(c context.Context, user *types.User) (*types.UserTo
 	req, err := createRequest(c, http.MethodPost, as.addr+loginURL, user)
 	if err != nil {
 		return nil, fiber.StatusInternalServerError, fmt.Errorf(
-			"couldn`t process provided credentials",
+			"couldnt process provided credentials",
 		)
 	}
 

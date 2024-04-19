@@ -1,6 +1,8 @@
 package types
 
-import "time"
+import (
+	"time"
+)
 
 type UserToken struct {
 	User  User  `json:"user"`

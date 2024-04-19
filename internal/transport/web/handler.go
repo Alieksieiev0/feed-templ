@@ -2,6 +2,7 @@ package web
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Alieksieiev0/feed-templ/internal/services"
 	"github.com/Alieksieiev0/feed-templ/internal/types"
@@ -118,6 +119,7 @@ func createPostHandler(serv services.FeedService) fiber.Handler {
 			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
 		}
 
+		fmt.Println("test")
 		c.Set("HX-Reswap", "afterbegin")
 		return render(c, feed.Post(*post), templ.WithStatus(statusCode))
 	}
@@ -162,9 +164,10 @@ func getPostsHandler(serv services.FeedService) fiber.Handler {
 
 func getUsersHandler(serv services.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		id := c.Cookies("id")
 		username := c.FormValue("username")
 		if username == "" {
-			return render(c, search.Results([]types.User{}), templ.WithStatus(fiber.StatusOK))
+			return render(c, search.Results([]types.User{}, id), templ.WithStatus(fiber.StatusOK))
 		}
 
 		users, statusCode, err := serv.Search(
@@ -173,11 +176,61 @@ func getUsersHandler(serv services.UserService) fiber.Handler {
 			"10",
 			"0",
 		)
+		if err != nil {
+			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
+		}
+
+		index := indexById(id, users)
+		if index >= 0 {
+			users = slices.Delete(users, index, index+1)
+		}
+
+		return render(c, search.Results(users, id), templ.WithStatus(statusCode))
+	}
+}
+
+func indexById(id string, users []types.User) int {
+	index := -1
+	if id == "" {
+		return index
+	}
+
+	for i, u := range users {
+		if u.Id == id {
+			index = i
+			break
+		}
+	}
+
+	return index
+}
+
+func subscribeHandler(serv services.FeedService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		subId := c.Cookies("id")
+		id := c.Params("id")
+		jwt := c.Cookies("jwt")
+
+		statusCode, err := serv.Subscribe(c.Context(), id, subId, jwt)
+		if statusCode == fiber.StatusUnauthorized {
+			clearCookies(c)
+			redirect(c, "/signin", statusCode)
+			return nil
+		}
 
 		if err != nil {
 			return c.Status(statusCode).Send([]byte("Error: " + err.Error()))
 		}
 
-		return render(c, search.Results(users), templ.WithStatus(statusCode))
+		return render(c, search.UnsubscribeButton(subId), templ.WithStatus(statusCode))
+	}
+}
+
+func getNotificationsHandler() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		c.Set("Content-Type", "text/event-stream")
+		c.Set("Cache-Control", "no-cache")
+		c.Set("Connection", "keep-alive")
+		return nil
 	}
 }

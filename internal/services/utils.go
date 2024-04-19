@@ -13,9 +13,8 @@ import (
 func readResponseError(resp *http.Response) error {
 	respErr := &types.ResponseError{}
 	err := json.NewDecoder(resp.Body).Decode(respErr)
-	fmt.Println(err)
 	if err != nil {
-		return fmt.Errorf("couldn`t process results of operation")
+		return fmt.Errorf("couldnt process results of operation")
 	}
 	return fmt.Errorf(respErr.Error)
 }

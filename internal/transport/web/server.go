@@ -45,6 +45,7 @@ func (ws *WebServer) Start(
 	ws.app.Post("/signup", signupHandler(authServ))
 	ws.app.Post("/signin", signinHandler(authServ))
 	ws.app.Post("/posts", createPostHandler(feedServ))
+	ws.app.Post("/subscribe/:id", subscribeHandler(feedServ))
 	ws.app.Use(NotFoundMiddleware)
 
 	return ws.app.Listen(ws.addr)
