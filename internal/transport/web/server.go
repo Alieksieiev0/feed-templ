@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Alieksieiev0/feed-templ/internal/services"
+	"github.com/Alieksieiev0/feed-templ/internal/transport/web/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -32,18 +33,18 @@ func (ws *WebServer) Start(serv services.Service) error {
 		Browse:     true,
 	}))
 
-	ws.app.Get("/", homeHandler(serv, serv))
-	ws.app.Get("/search", searchPage)
-	ws.app.Get("/signup", signupPage)
-	ws.app.Get("/signin", signinPage)
-	ws.app.Get("/posts", getPostsHandler(serv))
-	ws.app.Get("/users", getUsersHandler(serv))
-	ws.app.Get("/notifications", getNotificationsHandler(serv))
-	ws.app.Get("/notifications/listen", listenHandler(serv))
-	ws.app.Post("/signup", signupHandler(serv))
-	ws.app.Post("/signin", signinHandler(serv))
-	ws.app.Post("/posts", createPostHandler(serv))
-	ws.app.Post("/subscribe/:id", subscribeHandler(serv))
+	ws.app.Get("/", handlers.HomeHandler(serv))
+	ws.app.Get("/search", handlers.SearchPage)
+	ws.app.Get("/signup", handlers.SignupPage)
+	ws.app.Get("/signin", handlers.SigninPage)
+	ws.app.Get("/posts", handlers.GetPostsHandler(serv))
+	ws.app.Get("/users", handlers.GetUsersHandler(serv))
+	ws.app.Get("/notifications", handlers.GetNotificationsHandler(serv))
+	ws.app.Get("/notifications/listen", handlers.ListenHandler(serv))
+	ws.app.Post("/signup", handlers.SignupHandler(serv))
+	ws.app.Post("/signin", handlers.SigninHandler(serv))
+	ws.app.Post("/posts", handlers.CreatePostHandler(serv))
+	ws.app.Post("/subscribe/:id", handlers.SubscribeHandler(serv))
 	ws.app.Use(NotFoundMiddleware)
 
 	return ws.app.Listen(ws.addr)

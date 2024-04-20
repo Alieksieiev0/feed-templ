@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -16,7 +15,7 @@ const (
 )
 
 type NotificationServices interface {
-	Get(c context.Context, userId string) ([]types.Notification, int, error)
+	Get(c context.Context, userId string, params ...Param) ([]types.Notification, *Response)
 	Listen(c context.Context, userId string, ch chan<- *types.Notification) error
 }
 
@@ -33,10 +32,8 @@ type notificationService struct {
 func (ns *notificationService) Get(
 	c context.Context,
 	userId string,
-) ([]types.Notification, int, error) {
-	fmt.Println(ns.addr)
-	fmt.Println(userId)
-	fmt.Printf(userNotificationsURL, userId)
+	params ...Param,
+) ([]types.Notification, *Response) {
 	req, err := createRequest(
 		c,
 		http.MethodGet,
@@ -45,27 +42,21 @@ func (ns *notificationService) Get(
 	)
 
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
+	updateQuery(req, params)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt fetch notifications")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
-	fmt.Println(resp.StatusCode)
 	if resp.StatusCode == http.StatusOK {
 		notifications := []types.Notification{}
-		err = json.NewDecoder(resp.Body).Decode(&notifications)
-		if err != nil {
-			return nil, fiber.StatusInternalServerError, fmt.Errorf(
-				"couldnt verify received notifications",
-			)
-		}
-		return notifications, resp.StatusCode, nil
+		return notifications, parseResponse(resp, &notifications)
 	}
 
-	return nil, resp.StatusCode, readResponseError(resp)
+	return nil, NewResponse(resp.StatusCode, readResponseError(resp))
 }
 
 func (ns *notificationService) Listen(

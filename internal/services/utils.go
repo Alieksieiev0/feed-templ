@@ -11,16 +11,8 @@ import (
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
 	"github.com/fasthttp/websocket"
+	"github.com/gofiber/fiber/v2"
 )
-
-func readResponseError(resp *http.Response) error {
-	respErr := &types.ResponseError{}
-	err := json.NewDecoder(resp.Body).Decode(respErr)
-	if err != nil {
-		return fmt.Errorf("couldnt process results of operation")
-	}
-	return fmt.Errorf(respErr.Error)
-}
 
 func createRequest(c context.Context, method, url string, v any) (*http.Request, error) {
 	reader := &bytes.Reader{}
@@ -38,6 +30,32 @@ func createRequest(c context.Context, method, url string, v any) (*http.Request,
 	}
 	req.Header.Add("Content-Type", "application/json")
 	return req, nil
+}
+
+func updateQuery(req *http.Request, params []Param) {
+	if len(params) == 0 {
+		return
+	}
+	q := req.URL.Query()
+	ApplyParams(q, params)
+	req.URL.RawQuery = q.Encode()
+}
+
+func parseResponse[T any](resp *http.Response, entity *T) *Response {
+	err := json.NewDecoder(resp.Body).Decode(entity)
+	if err != nil {
+		return NewResponse(fiber.StatusInternalServerError, err)
+	}
+	return NewResponse(resp.StatusCode, err)
+}
+
+func readResponseError(resp *http.Response) error {
+	respErr := &types.ResponseError{}
+	err := json.NewDecoder(resp.Body).Decode(respErr)
+	if err != nil {
+		return fmt.Errorf("couldnt process results of operation")
+	}
+	return fmt.Errorf(respErr.Error)
 }
 
 func createWebsocketRequest(host, path string) (*websocket.Conn, error) {

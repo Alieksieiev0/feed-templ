@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -17,9 +16,9 @@ const (
 )
 
 type FeedService interface {
-	GetRecentPosts(c context.Context, limit, offset string) ([]types.Post, int, error)
-	Post(c context.Context, id, token string, post *types.Post) (int, error)
-	Subscribe(c context.Context, id, subId, token string) (int, error)
+	GetRecentPosts(c context.Context, params ...Param) ([]types.Post, *Response)
+	Post(c context.Context, id, token string, post *types.Post) *Response
+	Subscribe(c context.Context, id, subId, token string) *Response
 }
 
 func NewFeedService(addr string) FeedService {
@@ -34,65 +33,52 @@ type feedService struct {
 
 func (fs *feedService) GetRecentPosts(
 	c context.Context,
-	limit, offset string,
-) ([]types.Post, int, error) {
+	params ...Param,
+) ([]types.Post, *Response) {
 	req, err := createRequest(c, http.MethodGet, fs.addr+postsURL, nil)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
-	q := req.URL.Query()
-	q.Add("limit", limit)
-	q.Add("offset", offset)
-	q.Add("sort_by", "created_at")
-	q.Add("order_by", "desc")
-	req.URL.RawQuery = q.Encode()
-
+	params = append(params, SortBy("created_at"), OrderBy("desc"))
+	updateQuery(req, params)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt fetch posts")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		posts := []types.Post{}
-		err = json.NewDecoder(resp.Body).Decode(&posts)
-		if err != nil {
-			return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt verify received posts")
-		}
-		return posts, resp.StatusCode, nil
+		return posts, parseResponse(resp, &posts)
 	}
 
-	return nil, resp.StatusCode, readResponseError(resp)
+	return nil, NewResponse(resp.StatusCode, readResponseError(resp))
 }
 
 func (fs *feedService) Post(
 	c context.Context,
 	id, token string,
 	post *types.Post,
-) (int, error) {
+) *Response {
 	req, err := createRequest(c, http.MethodPut, fs.addr+fmt.Sprintf(postURL, id), post)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 	req.Header.Add("Authorization", token)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldnt create post")
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == fiber.StatusCreated {
-		err = json.NewDecoder(resp.Body).Decode(post)
-		if err != nil {
-			return fiber.StatusInternalServerError, fmt.Errorf("couldnt verify post creation")
-		}
-		return resp.StatusCode, nil
+		return parseResponse(resp, post)
 	}
 
-	return resp.StatusCode, readResponseError(resp)
+	return NewResponse(resp.StatusCode, readResponseError(resp))
 }
 
-func (fs *feedService) Subscribe(c context.Context, id, subId, token string) (int, error) {
+func (fs *feedService) Subscribe(c context.Context, id, subId, token string) *Response {
 	req, err := createRequest(
 		c,
 		http.MethodPut,
@@ -100,18 +86,18 @@ func (fs *feedService) Subscribe(c context.Context, id, subId, token string) (in
 		&types.UserBase{Id: subId},
 	)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 	req.Header.Add("Authorization", token)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldnt subscribe")
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == fiber.StatusOK {
-		return resp.StatusCode, nil
+		return NewResponse(resp.StatusCode, nil)
 	}
 
-	return resp.StatusCode, readResponseError(resp)
+	return NewResponse(resp.StatusCode, readResponseError(resp))
 }

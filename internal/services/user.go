@@ -2,8 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
@@ -15,7 +13,7 @@ var (
 )
 
 type UserService interface {
-	Search(c context.Context, query, limit, offset string) ([]types.User, int, error)
+	Search(c context.Context, params ...Param) ([]types.User, *Response)
 }
 
 func NewUserService(addr string) UserService {
@@ -28,34 +26,22 @@ type userService struct {
 	addr string
 }
 
-func (us *userService) Search(
-	c context.Context,
-	query, limit, offset string,
-) ([]types.User, int, error) {
+func (us *userService) Search(c context.Context, params ...Param) ([]types.User, *Response) {
 	req, err := createRequest(c, http.MethodGet, us.addr+usersUrl, nil)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided data")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
-	q := req.URL.Query()
-	q.Add("limit", limit)
-	q.Add("offset", offset)
-	q.Add("username", query)
-	req.URL.RawQuery = q.Encode()
-
+	updateQuery(req, params)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt fetch posts")
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		users := []types.User{}
-		err = json.NewDecoder(resp.Body).Decode(&users)
-		if err != nil {
-			return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt verify received posts")
-		}
-		return users, resp.StatusCode, nil
+		return users, parseResponse(resp, &users)
 	}
 
-	return nil, resp.StatusCode, readResponseError(resp)
+	return nil, NewResponse(resp.StatusCode, readResponseError(resp))
 }

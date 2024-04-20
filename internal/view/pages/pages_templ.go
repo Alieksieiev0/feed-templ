@@ -13,9 +13,8 @@ import "bytes"
 import "github.com/Alieksieiev0/feed-templ/internal/types"
 import "github.com/Alieksieiev0/feed-templ/internal/view/feed"
 import "github.com/Alieksieiev0/feed-templ/internal/view/core"
-import "github.com/Alieksieiev0/feed-templ/internal/view/notify"
 
-func Home(isLoggedIn bool, posts []types.Post, notifications []types.Notification) templ.Component {
+func Home(isLoggedIn bool, posts []types.Post) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -28,15 +27,7 @@ func Home(isLoggedIn bool, posts []types.Post, notifications []types.Notificatio
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-center items-center\"><div>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = notify.Notifications(notifications).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"w-1/3\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-center items-center\"><div class=\"w-1/3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

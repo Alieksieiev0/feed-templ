@@ -2,8 +2,6 @@ package services
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
@@ -16,8 +14,8 @@ const (
 )
 
 type AuthService interface {
-	Register(c context.Context, user *types.User) (int, error)
-	Login(c context.Context, user *types.User) (*types.UserToken, int, error)
+	Register(c context.Context, user *types.User) *Response
+	Login(c context.Context, user *types.User) (*types.UserToken, *Response)
 }
 
 func NewAuthService(addr string) AuthService {
@@ -30,50 +28,39 @@ type authService struct {
 	addr string
 }
 
-func (as *authService) Register(c context.Context, user *types.User) (int, error) {
+func (as *authService) Register(c context.Context, user *types.User) *Response {
 	req, err := createRequest(c, http.MethodPost, as.addr+registerURL, user)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf("couldnt process provided credentials")
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fiber.StatusInternalServerError, fmt.Errorf(
-			"couldnt register user with provided credentials",
-		)
+		return NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == fiber.StatusCreated {
-		return resp.StatusCode, nil
+		return NewResponse(resp.StatusCode, nil)
 	}
 
-	return resp.StatusCode, readResponseError(resp)
+	return NewResponse(resp.StatusCode, readResponseError(resp))
 }
 
-func (as *authService) Login(c context.Context, user *types.User) (*types.UserToken, int, error) {
+func (as *authService) Login(c context.Context, user *types.User) (*types.UserToken, *Response) {
 	req, err := createRequest(c, http.MethodPost, as.addr+loginURL, user)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf(
-			"couldnt process provided credentials",
-		)
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
-	fmt.Println(err)
 	if err != nil {
-		return nil, fiber.StatusInternalServerError, fmt.Errorf(
-			"couldnt login user with provided credentials",
-		)
+		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
 	if resp.StatusCode == fiber.StatusOK {
 		userToken := &types.UserToken{}
-		err = json.NewDecoder(resp.Body).Decode(userToken)
-		if err != nil {
-			return nil, fiber.StatusInternalServerError, fmt.Errorf("couldnt verify credentials")
-		}
-		return userToken, resp.StatusCode, nil
+		return userToken, parseResponse(resp, userToken)
 	}
 
-	return nil, resp.StatusCode, readResponseError(resp)
+	return nil, NewResponse(resp.StatusCode, readResponseError(resp))
 }
