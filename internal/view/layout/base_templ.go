@@ -23,7 +23,7 @@ func Base(isLoggedIn bool, contents templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/static/css/output.css\" rel=\"stylesheet\"><script src=\"https://unpkg.com/htmx.org@1.9.11\"></script><script src=\"https://unpkg.com/htmx.org@1.9.11/dist/ext/response-targets.js\"></script><script>\n                htmx.logger = function(elt, event, data) {\n                    if(console) {\n                        console.log(event, elt, data);\n                    }\n                }\n            </script><script>\n\n            </script><title>GoFeed</title></head><body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link href=\"/static/css/output.css\" rel=\"stylesheet\"><link href=\"https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css\" rel=\"stylesheet\"><script src=\"https://unpkg.com/htmx.org@1.9.11\"></script><script src=\"https://unpkg.com/htmx.org@1.9.11/dist/ext/response-targets.js\"></script><script src=\"https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js\"></script><script>\n                htmx.logger = function(elt, event, data) {\n                    if(console) {\n                        console.log(event, elt, data);\n                    }\n                }\n            </script><title>GoFeed</title></head><body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -39,7 +39,7 @@ func Base(isLoggedIn bool, contents templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"mt-6 text-center\">footer</div></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div class=\"mt-6 text-center\">footer</div><script src=\"https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

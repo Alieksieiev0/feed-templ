@@ -6,17 +6,16 @@ templ Base(isLoggedIn bool, contents templ.Component) {
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<link href="/static/css/output.css" rel="stylesheet"/>
+			<link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
 			<script src="https://unpkg.com/htmx.org@1.9.11"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/response-targets.js"></script>
+			<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
 			<script>
                 htmx.logger = function(elt, event, data) {
                     if(console) {
                         console.log(event, elt, data);
                     }
                 }
-            </script>
-			<script>
-
             </script>
 			<title>GoFeed</title>
 		</head>
@@ -28,6 +27,7 @@ templ Base(isLoggedIn bool, contents templ.Component) {
 			<div class="mt-6 text-center">
 				footer
 			</div>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 		</body>
 	</html>
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/Alieksieiev0/feed-templ/internal/types"
 	"github.com/gofiber/fiber/v2"
@@ -64,7 +65,12 @@ func (ns *notificationService) Listen(
 	userId string,
 	ch chan<- *types.Notification,
 ) error {
-	conn, err := createWebsocketRequest(ns.addr, userListenURL)
+	URL, err := url.Parse(ns.addr)
+	if err != nil {
+		return err
+	}
+
+	conn, err := createWebsocketRequest(URL.Host, fmt.Sprintf(userListenURL, userId))
 	if err != nil {
 		return err
 	}

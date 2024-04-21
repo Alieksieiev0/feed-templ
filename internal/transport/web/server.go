@@ -7,7 +7,6 @@ import (
 	"github.com/Alieksieiev0/feed-templ/internal/transport/web/handlers"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 type WebServer struct {
@@ -23,9 +22,6 @@ func NewWebServer(app *fiber.App, addr string) *WebServer {
 }
 
 func (ws *WebServer) Start(serv services.Service) error {
-	ws.app.Use(logger.New(logger.Config{
-		Format: "${time} | ${status} | ${latency} | ${method} | ${path} | ${error}\nResponse Body: ${resBody}\n",
-	}))
 
 	ws.app.Use("/static", filesystem.New(filesystem.Config{
 		Root:       http.Dir("./"),

@@ -12,6 +12,27 @@ import "bytes"
 
 import "github.com/Alieksieiev0/feed-templ/internal/types"
 
+func observeNotifications() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_observeNotifications_309c`,
+		Function: `function __templ_observeNotifications_309c(){document.body.addEventListener('htmx:load', function(evt) {
+        const el = evt.detail.elt;
+        console.log("load: ", el.id);
+        if (!el.id.includes("notification-")) {
+            return;
+        }
+        const parent = el.parentNode;
+        if (parent.childElemntsCount <= 10) {
+            return
+        }
+        parent.removeChild(parent.lastChild);
+    });
+}`,
+		Call:       templ.SafeScript(`__templ_observeNotifications_309c`),
+		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_309c`),
+	}
+}
+
 func Menu() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -25,7 +46,11 @@ func Menu() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- component --><button class=\"middle none center flex items-center justify-center rounded-lg p-3 font-sans text-xs font-bold uppercase text-primary-500 transition-all hover:bg-primary-500/10 active:bg-pink-500/30 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none\" data-ripple-dark=\"true\" data-popover-target=\"notifications-menu\"><i class=\"fas fa-bell text-lg leading-none\"></i></button><ul role=\"menu\" data-popover=\"notifications-menu\" data-popover-placement=\"bottom\" class=\"absolute z-10 flex min-w-[180px] flex-col gap-2 overflow-auto rounded-md border border-blue-gray-50 bg-white p-3 font-sans text-sm font-normal text-blue-gray-500 shadow-lg shadow-blue-gray-500/10 focus:outline-none\"><div hx-get=\"/notifications?limit=10&amp;status=NEW\" hx-trigger=\"load\" hx-swap=\"outerHTML\"></div></ul><!-- stylesheet --><link rel=\"stylesheet\" href=\"https://unpkg.com/@material-tailwind/html@latest/styles/material-tailwind.css\"><!-- from cdn --><script type=\"module\" src=\"https://unpkg.com/@material-tailwind/html@latest/scripts/popover.js\"></script><!-- from cdn --><script src=\"https://unpkg.com/@material-tailwind/html@latest/scripts/ripple.js\"></script><!-- Font Awesome Link --><link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css\" integrity=\"sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w==\" crossorigin=\"anonymous\">")
+		templ_7745c5c3_Err = observeNotifications().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button data-dropdown-toggle=\"notifications-menu\" class=\"text-blue-400 hover:text-white hover:ripple-bg-blue-300 rounded-lg px-5 py-2.5\"><svg class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0\"></path></svg></button><div id=\"notifications-menu\" class=\"absolute z-10 hidden w-auto text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm\"><div hx-ext=\"sse\" sse-connect=\"/notifications/listen\" sse-swap=\"message\" hx-target=\"#notifications\" hx-swap=\"afterbegin\"></div><div hx-get=\"/notifications?limit=10&amp;status=NEW\" hx-trigger=\"load\" hx-swap=\"outerHTML\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -49,11 +74,19 @@ func Notifications(notifications []types.Notification) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notifications\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		for _, n := range notifications {
 			templ_7745c5c3_Err = Notification(n).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		if !templ_7745c5c3_IsBuffer {
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteTo(templ_7745c5c3_W)
@@ -75,29 +108,51 @@ func Notification(notification types.Notification) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button role=\"menuitem\" class=\"flex w-full cursor-pointer select-none items-center gap-4 rounded-md px-3 py-2 pr-8 pl-2 text-start leading-tight outline-none transition-all hover:bg-blue-gray-50 hover:bg-opacity-80 hover:text-blue-gray-900 focus:bg-blue-gray-50 focus:bg-opacity-80 focus:text-blue-gray-900 active:bg-blue-gray-50 active:bg-opacity-80 active:text-blue-gray-900\"><div class=\"relative bg-gray-100 inline-block h-12 w-12 !rounded-full object-cover object-center\"><svg class=\"absolute w-12 h-12 text-gray-400\" fill=\"currentColor\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" d=\"M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z\" clip-rule=\"evenodd\"></path></svg></div><div class=\"flex flex-col gap-1\"><p class=\"block font-sans text-sm font-normal leading-normal text-gray-700 antialiased\"><span class=\"font-medium text-blue-gray-900\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(notification.FromName)
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("notification-" + notification.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 56, Col: 72}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 49, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span> ")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"flex w-full items-center gap-4 rounded-md px-3 py-2 pr-8 pl-2 text-start outline-none transition-all hover:bg-blue-50 hover:bg-opacity-80 hover:text-blue-900 focus:bg-blue-50 focus:bg-opacity-80 focus:text-blue-900 active:bg-blue-50 active:bg-opacity-80 active:text-blue-900\"><div class=\"relative bg-gray-100 inline-block h-10 w-10 overflow-hidden !rounded-full object-cover object-center\"><svg class=\"absolute w-12 h-12 text-gray-400 -left-1\" fill=\"currentColor\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" d=\"M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z\" clip-rule=\"evenodd\"></path></svg></div><div class=\"flex flex-col gap-1\"><p class=\"block font-sans text-sm font-normal leading-normal text-gray-700 antialiased\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(notification.Message())
+		var templ_7745c5c3_Var5 templ.SafeURL = templ.SafeURL("/profile/" + notification.FromId)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var5)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 56, Col: 106}
+			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><span class=\"font-medium text-primary-900\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var6 string
+		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(notification.FromName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 57, Col: 131}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</span></a> ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var7 string
+		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(notification.Message())
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 57, Col: 169}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,16 +160,16 @@ func Notification(notification types.Notification) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 string
-		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(notification.CreatedAt.Format("January 2, 2006"))
+		var templ_7745c5c3_Var8 string
+		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(notification.CreatedAt.Format("January 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 74, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 75, Col: 54}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></button>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
