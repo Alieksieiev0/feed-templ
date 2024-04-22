@@ -15,7 +15,7 @@ func HomePageHandler(feedServ services.FeedService) fiber.Handler {
 		posts, r := feedServ.GetPosts(
 			c.Context(),
 			services.Limit(postsStep),
-			services.SortBy("created_date"),
+			services.SortBy("created_at"),
 			services.OrderBy("desc"),
 		)
 		if r.Err != nil {

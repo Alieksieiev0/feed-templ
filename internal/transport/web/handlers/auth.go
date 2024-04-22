@@ -53,6 +53,11 @@ func SigninHandler(serv services.AuthService) fiber.Handler {
 	}
 }
 
+func SignoutHandler(c *fiber.Ctx) error {
+	c.ClearCookie("jwt", "id", "username", "email")
+	return c.Redirect("/")
+}
+
 func setUserTokenCookies(c *fiber.Ctx, userToken *types.UserToken) {
 	c.Cookie(sessionCookie("jwt", userToken.Token.Value))
 	c.Cookie(sessionCookie("id", userToken.User.Id))

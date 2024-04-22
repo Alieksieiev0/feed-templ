@@ -14,10 +14,9 @@ import "github.com/Alieksieiev0/feed-templ/internal/types"
 
 func observeNotifications() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_observeNotifications_309c`,
-		Function: `function __templ_observeNotifications_309c(){document.body.addEventListener('htmx:load', function(evt) {
+		Name: `__templ_observeNotifications_90a2`,
+		Function: `function __templ_observeNotifications_90a2(){document.body.addEventListener('htmx:load', function(evt) {
         const el = evt.detail.elt;
-        console.log("load: ", el.id);
         if (!el.id.includes("notification-")) {
             return;
         }
@@ -28,8 +27,8 @@ func observeNotifications() templ.ComponentScript {
         parent.removeChild(parent.lastChild);
     });
 }`,
-		Call:       templ.SafeScript(`__templ_observeNotifications_309c`),
-		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_309c`),
+		Call:       templ.SafeScript(`__templ_observeNotifications_90a2`),
+		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_90a2`),
 	}
 }
 
@@ -50,7 +49,7 @@ func Menu() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button data-dropdown-toggle=\"notifications-menu\" class=\"text-blue-400 hover:text-white hover:ripple-bg-blue-300 rounded-lg px-5 py-2.5\"><svg class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0\"></path></svg></button><div id=\"notifications-menu\" class=\"absolute z-10 hidden w-auto text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm\"><div hx-ext=\"sse\" sse-connect=\"/notifications/listen\" sse-swap=\"message\" hx-target=\"#notifications\" hx-swap=\"afterbegin\"></div><div hx-get=\"/notifications?limit=10&amp;status=NEW\" hx-trigger=\"load\" hx-swap=\"outerHTML\"></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button data-dropdown-toggle=\"notifications-menu\" class=\"text-blue-400 hover:text-white hover:ripple-bg-blue-300 rounded-lg px-2 py-2\"><svg class=\"h-6 w-6\" fill=\"none\" viewBox=\"0 0 24 24\" stroke-width=\"1.5\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0\"></path></svg></button><div id=\"notifications-menu\" class=\"absolute z-10 hidden w-auto text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm\"><div hx-ext=\"sse\" sse-connect=\"/notifications/listen\" sse-swap=\"message\" hx-target=\"#notifications\" hx-swap=\"afterbegin\"></div><div hx-get=\"/notifications?limit=10&amp;status=NEW\" hx-trigger=\"load\" hx-swap=\"outerHTML\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -74,7 +73,17 @@ func Notifications(notifications []types.Notification) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notifications\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"notifications\"><div class=\"p-4\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(notifications) == 0 {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("You dont have any new notifications!")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +124,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("notification-" + notification.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 49, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 53, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -137,7 +146,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(notification.FromName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 57, Col: 131}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 61, Col: 131}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -150,7 +159,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(notification.Message())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 57, Col: 169}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 61, Col: 169}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -163,7 +172,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(notification.CreatedAt.Format("January 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 75, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 79, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {

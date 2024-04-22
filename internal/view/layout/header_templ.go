@@ -25,7 +25,7 @@ func header(isLoggedIn bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav class=\"bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800\"><div class=\"flex flex-wrap justify-between items-center mx-auto max-w-screen-xl\"><a href=\"/\" class=\"flex items-center\"><img src=\"https://flowbite.com/docs/images/logo.svg\" class=\"mr-3 h-6 sm:h-9\" alt=\"GoFeed Logo\"> <span class=\"self-center text-xl font-semibold whitespace-nowrap dark:text-white\">GoFeed</span></a><div class=\"hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1\"><ul id=\"pages\" class=\"flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0\"><li><a href=\"/\" class=\"py-2 pr-4 pl-4\">Home</a></li><li><a href=\"/search\" class=\"py-2 pr-4 pl-4\">Search</a></li></ul></div><div class=\"flex items-center lg:order-2\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav class=\"bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800\"><div class=\"flex flex-wrap justify-between items-center mx-auto max-w-screen-xl\"><a href=\"/\" class=\"flex items-center\"><img src=\"https://flowbite.com/docs/images/logo.svg\" class=\"mr-3 h-6 sm:h-9\" alt=\"GoFeed Logo\"> <span class=\"self-center text-xl font-semibold whitespace-nowrap dark:text-white\">GoFeed</span></a><div class=\"justify-between items-center flex w-auto\"><ul id=\"pages\" class=\"flex font-medium flex-row space-x-8\"><li><a href=\"/\" class=\"py-2 pr-4 pl-4\">Home</a></li><li><a href=\"/search\" class=\"py-2 pr-4 pl-4\">Search</a></li></ul></div><div class=\"flex items-center \">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -35,7 +35,7 @@ func header(isLoggedIn bool) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"px-4\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"px-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -43,7 +43,7 @@ func header(isLoggedIn bool) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><a href=\"/profile\"><div class=\"relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600\"><svg class=\"absolute w-12 h-12 text-gray-400 -left-1\" fill=\"currentColor\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" d=\"M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z\" clip-rule=\"evenodd\"></path></svg></div></a>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><a class=\"px-4\" href=\"/profile\"><div class=\"relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600\"><svg class=\"absolute w-12 h-12 text-gray-400 -left-1\" fill=\"currentColor\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path fill-rule=\"evenodd\" d=\"M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z\" clip-rule=\"evenodd\"></path></svg></div></a> <a href=\"/signout\" class=\"text-white font-semibold bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 rounded-lg text-sm px-2 mx-4 py-2 focus:outline-none\">Sign out</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

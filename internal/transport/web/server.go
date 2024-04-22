@@ -61,6 +61,7 @@ func (ws *WebServer) notificationHandlers(serv services.NotificationServices) {
 }
 
 func (ws *WebServer) authHandlers(serv services.AuthService) {
+	ws.app.Get("/signout", handlers.SignoutHandler)
 	ws.app.Post("/signup", handlers.SignupHandler(serv))
 	ws.app.Post("/signin", handlers.SigninHandler(serv))
 }
