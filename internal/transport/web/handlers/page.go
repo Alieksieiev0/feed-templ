@@ -10,7 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func HomeHandler(feedServ services.FeedService) fiber.Handler {
+func HomePageHandler(feedServ services.FeedService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		posts, r := feedServ.GetPosts(
 			c.Context(),
