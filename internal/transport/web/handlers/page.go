@@ -12,7 +12,12 @@ import (
 
 func HomeHandler(feedServ services.FeedService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		posts, r := feedServ.GetRecentPosts(c.Context(), services.Limit(postsStep))
+		posts, r := feedServ.GetPosts(
+			c.Context(),
+			services.Limit(postsStep),
+			services.SortBy("created_date"),
+			services.OrderBy("desc"),
+		)
 		if r.Err != nil {
 			return Render(
 				c,

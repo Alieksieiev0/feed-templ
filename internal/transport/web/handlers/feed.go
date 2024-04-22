@@ -31,10 +31,12 @@ func GetPostsHandler(serv services.FeedService) fiber.Handler {
 			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + settingsErr))
 		}
 
-		posts, r := serv.GetRecentPosts(
+		posts, r := serv.GetPosts(
 			c.Context(),
 			services.Limit(limit),
 			services.Offset(offset),
+			services.SortBy("created_at"),
+			services.OrderBy("desc"),
 		)
 
 		if r.Err != nil {

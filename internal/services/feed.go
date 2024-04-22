@@ -16,7 +16,7 @@ const (
 )
 
 type FeedService interface {
-	GetRecentPosts(c context.Context, params ...Param) ([]types.Post, *Response)
+	GetPosts(c context.Context, params ...Param) ([]types.Post, *Response)
 	Post(c context.Context, id, token string, post *types.Post) *Response
 	Subscribe(c context.Context, id, subId, token string) *Response
 }
@@ -31,16 +31,12 @@ type feedService struct {
 	addr string
 }
 
-func (fs *feedService) GetRecentPosts(
-	c context.Context,
-	params ...Param,
-) ([]types.Post, *Response) {
+func (fs *feedService) GetPosts(c context.Context, params ...Param) ([]types.Post, *Response) {
 	req, err := createRequest(c, http.MethodGet, fs.addr+postsURL, nil)
 	if err != nil {
 		return nil, NewResponse(fiber.StatusInternalServerError, err)
 	}
 
-	params = append(params, SortBy("created_at"), OrderBy("desc"))
 	updateQuery(req, params)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -55,11 +51,7 @@ func (fs *feedService) GetRecentPosts(
 	return nil, NewResponse(resp.StatusCode, readResponseError(resp))
 }
 
-func (fs *feedService) Post(
-	c context.Context,
-	id, token string,
-	post *types.Post,
-) *Response {
+func (fs *feedService) Post(c context.Context, id, token string, post *types.Post) *Response {
 	req, err := createRequest(c, http.MethodPut, fs.addr+fmt.Sprintf(postURL, id), post)
 	if err != nil {
 		return NewResponse(fiber.StatusInternalServerError, err)

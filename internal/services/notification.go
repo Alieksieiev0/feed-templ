@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	userNotificationsURL = "/api/notify/notifications/%s"
-	userListenURL        = "/api/notify/listen/%s"
+	notificationsURL = "/api/notify/notifications/%s"
+	listenURL        = "/api/notify/listen/%s"
 )
 
 type NotificationServices interface {
@@ -38,7 +38,7 @@ func (ns *notificationService) Get(
 	req, err := createRequest(
 		c,
 		http.MethodGet,
-		ns.addr+fmt.Sprintf(userNotificationsURL, userId),
+		ns.addr+fmt.Sprintf(notificationsURL, userId),
 		nil,
 	)
 
@@ -70,7 +70,7 @@ func (ns *notificationService) Listen(
 		return err
 	}
 
-	conn, err := createWebsocketRequest(URL.Host, fmt.Sprintf(userListenURL, userId))
+	conn, err := createWebsocketRequest(URL.Host, fmt.Sprintf(listenURL, userId))
 	if err != nil {
 		return err
 	}
