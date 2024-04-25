@@ -11,16 +11,18 @@ import (
 )
 
 const (
-	notificationsURL = "/api/notify/notifications/%s"
-	listenURL        = "/api/notify/listen/%s"
+	notificationURL = "/api/notify/notifications/%s"
+	reviewURL       = "/api/notify/review/%s"
+	listenURL       = "/api/notify/listen/%s"
 )
 
-type NotificationServices interface {
+type NotificationService interface {
 	Get(c context.Context, userId string, params ...Param) ([]types.Notification, *Response)
 	Listen(c context.Context, userId string, ch chan<- *types.Notification) error
+	Review(c context.Context, id string) *Response
 }
 
-func NewNotificationService(addr string) NotificationServices {
+func NewNotificationService(addr string) NotificationService {
 	return &notificationService{
 		addr: addr,
 	}
@@ -38,7 +40,7 @@ func (ns *notificationService) Get(
 	req, err := createRequest(
 		c,
 		http.MethodGet,
-		ns.addr+fmt.Sprintf(notificationsURL, userId),
+		ns.addr+fmt.Sprintf(notificationURL, userId),
 		nil,
 	)
 
@@ -75,4 +77,27 @@ func (ns *notificationService) Listen(
 		return err
 	}
 	return listenWebsocket(conn, ch)
+}
+
+func (ns *notificationService) Review(c context.Context, id string) *Response {
+	req, err := createRequest(c, http.MethodPut, ns.addr+fmt.Sprintf(reviewURL, id), nil)
+	fmt.Println(ns.addr + fmt.Sprintf(reviewURL, id))
+
+	if err != nil {
+		fmt.Println(err)
+		return NewResponse(fiber.StatusInternalServerError, err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return NewResponse(fiber.StatusInternalServerError, err)
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		return NewResponse(resp.StatusCode, nil)
+	}
+
+	fmt.Println(resp.StatusCode)
+	return NewResponse(resp.StatusCode, readResponseError(resp))
 }

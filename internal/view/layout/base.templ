@@ -19,14 +19,16 @@ templ Base(isLoggedIn bool, contents templ.Component) {
             </script>
 			<title>GoFeed</title>
 		</head>
-		<body>
+		<body class="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
 			@header(isLoggedIn)
-			<div hx-ext="response-targets">
+			<div hx-ext="response-targets" class=" my-6 ">
 				@contents
 			</div>
-			<div class="mt-6 text-center">
-				footer
-			</div>
+			<footer class="sticky top-[100vh] bg-white">
+				<div class="text-lg text-center py-6">
+					footer
+				</div>
+			</footer>
 			<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 		</body>
 	</html>

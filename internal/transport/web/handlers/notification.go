@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/Alieksieiev0/feed-templ/internal/services"
 	"github.com/Alieksieiev0/feed-templ/internal/types"
@@ -18,36 +19,34 @@ import (
 )
 
 const (
+	YYYYMMDD = "2006-01-02"
 	queryErr = "bad query params were found while preparing to load posts"
 )
 
-func GetNotificationsHandler(serv services.NotificationServices) fiber.Handler {
+func GetNotificationsHandler(serv services.NotificationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		limit, err := strconv.Atoi(c.Query("limit", "10"))
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + queryErr))
 		}
 
-		status := c.Query("status")
-		if status == "" {
-			return c.Status(fiber.StatusInternalServerError).Send([]byte("Error: " + queryErr))
-		}
-
 		notifications, r := serv.Get(
 			c.Context(),
 			c.Cookies("id"),
+			services.DefaultParam("created_at", time.Now().UTC().Format(YYYYMMDD)),
 			services.Limit(limit),
-			services.DefaultParam("status", status),
+			services.SortBy("created_at"),
+			services.OrderBy("desc"),
 		)
 		if r.Err != nil {
 			return r.SendError(c)
 		}
 
-		return Render(c, notify.Notifications(notifications))
+		return Render(c, notify.Notifications(notifications), templ.WithStatus(r.StatusCode))
 	}
 }
 
-func ListenHandler(serv services.NotificationServices) fiber.Handler {
+func ListenHandler(serv services.NotificationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
@@ -63,7 +62,6 @@ func ListenHandler(serv services.NotificationServices) fiber.Handler {
 		c.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 			for {
 				notification := <-ch
-				fmt.Printf("notif: %+v", notification)
 				if notification == nil {
 					break
 				}
@@ -100,5 +98,29 @@ func ListenHandler(serv services.NotificationServices) fiber.Handler {
 
 		c.Status(fiber.StatusOK)
 		return nil
+	}
+}
+
+func ReviewHandler(serv services.NotificationService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		r := serv.Review(c.Context(), id)
+		if r.Err != nil {
+			return r.SendError(c)
+		}
+
+		notifications, r := serv.Get(
+			c.Context(),
+			c.Cookies("id"),
+			services.Limit(10),
+			services.DefaultParam("created_at", time.Now().UTC().Format(YYYYMMDD)),
+			services.SortBy("created_at"),
+			services.OrderBy("desc"),
+		)
+		if r.Err != nil {
+			return r.SendError(c)
+		}
+
+		return Render(c, notify.Notifications(notifications), templ.WithStatus(fiber.StatusOK))
 	}
 }

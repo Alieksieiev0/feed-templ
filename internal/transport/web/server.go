@@ -38,26 +38,30 @@ func (ws *WebServer) Start(serv services.Service) error {
 	return ws.app.Listen(ws.addr)
 }
 
-func (ws *WebServer) pageHandlers(serv services.FeedService) {
+func (ws *WebServer) pageHandlers(serv services.Service) {
 	ws.app.Get("/", handlers.HomePageHandler(serv))
 	ws.app.Get("/search", handlers.SearchPage)
 	ws.app.Get("/signup", handlers.SignupPage)
 	ws.app.Get("/signin", handlers.SigninPage)
+	ws.app.Get("/profile", handlers.ProfilePage(serv, serv))
+	ws.app.Get("/profile/:id", handlers.ProfilePage(serv, serv))
 }
 
 func (ws *WebServer) feedHandlers(serv services.FeedService) {
 	ws.app.Get("/posts", handlers.GetPostsHandler(serv))
 	ws.app.Post("/posts", handlers.CreatePostHandler(serv))
 	ws.app.Post("/subscribe/:id", handlers.SubscribeHandler(serv))
+	ws.app.Post("/unsubscribe/:id", handlers.UnsubscribeHandler(serv))
 }
 
 func (ws *WebServer) userHandlers(serv services.UserService) {
 	ws.app.Get("/users", handlers.GetUsersHandler(serv))
 }
 
-func (ws *WebServer) notificationHandlers(serv services.NotificationServices) {
+func (ws *WebServer) notificationHandlers(serv services.NotificationService) {
 	ws.app.Get("/notifications", handlers.GetNotificationsHandler(serv))
 	ws.app.Get("/notifications/listen", handlers.ListenHandler(serv))
+	ws.app.Put("/notifications/review/:id", handlers.ReviewHandler(serv))
 }
 
 func (ws *WebServer) authHandlers(serv services.AuthService) {

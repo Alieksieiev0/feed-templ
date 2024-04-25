@@ -15,7 +15,7 @@ func Run() {
 		webServerAddr = flag.String("web-server", ":3003", "listen address of web server")
 		apiAddr       = flag.String(
 			"api",
-			"http://localhost:8080",
+			"http://localhost:80",
 			"api address",
 		)
 	)

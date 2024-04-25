@@ -9,7 +9,7 @@ script observeNotifications() {
             return;
         }
         const parent = el.parentNode;
-        if (parent.childElemntsCount <= 10) {
+        if (parent.childElemntCount <= 10) {
             return
         }
         parent.removeChild(parent.lastChild);
@@ -31,21 +31,38 @@ templ Menu() {
 		class="absolute z-10 hidden w-auto text-sm text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm"
 	>
 		<div hx-ext="sse" sse-connect="/notifications/listen" sse-swap="message" hx-target="#notifications" hx-swap="afterbegin"></div>
-		<div hx-get="/notifications?limit=10&status=NEW" hx-trigger="load" hx-swap="outerHTML"></div>
+		<div hx-get="/notifications?limit=10" hx-trigger="load" hx-swap="outerHTML"></div>
 	</div>
 }
 
 templ Notifications(notifications []types.Notification) {
 	<div id="notifications">
-		<div class="p-4">
-			if len(notifications) == 0 {
-				You dont have any new notifications!
-			}
-		</div>
-		for _, n := range notifications {
-			@Notification(n)
+		if countNew(notifications) == 0 {
+			<div class="p-4 text-lg">
+				You dont have any new notifications for today!
+			</div>
 		}
+		for _, n := range notifications {
+			if (n.IsNew()) {
+				@Notification(n)
+			}
+		}
+		/*
+		<a href="/user-notifications" class="flex w-full justify-center text-lg rounded-md bg-primary-600 py-2 font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
+			View All 
+		</a>
+        */
 	</div>
+}
+
+func countNew(notifications []types.Notification) int {
+	count := 0
+	for _, n := range notifications {
+		if n.IsNew() {
+			count++
+		}
+	}
+	return count
 }
 
 templ Notification(notification types.Notification) {
@@ -57,10 +74,10 @@ templ Notification(notification types.Notification) {
 			<svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
 		</div>
 		<div class="flex flex-col gap-1">
-			<p class="block font-sans text-sm font-normal leading-normal text-gray-700 antialiased">
+			<p class="block font-sans text-lg font-normal leading-normal text-gray-700 antialiased">
 				<a href={ templ.SafeURL("/profile/" + notification.FromId) }><span class="font-medium text-primary-900">{ notification.FromName }</span></a> { notification.Message() }
 			</p>
-			<p class="flex items-center gap-1 font-sans text-xs font-light text-gray-600 antialiased">
+			<p class="flex items-center gap-1 font-sans font-light text-gray-600 antialiased">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
@@ -79,5 +96,17 @@ templ Notification(notification types.Notification) {
 				{ notification.CreatedAt.Format("January 2, 2006") }
 			</p>
 		</div>
+		<button
+			type="button"
+			hx-put={ "/notifications/review/" + notification.Id }
+			class="rounded-md p-2 inline-flex items-center justify-center text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+			hx-target="notifications"
+			hx-swap="outerHTML"
+		>
+			<span class="sr-only"></span>
+			<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+			</svg>
+		</button>
 	</div>
 }

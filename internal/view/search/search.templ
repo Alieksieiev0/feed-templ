@@ -1,47 +1,48 @@
 package search
 
 import "github.com/Alieksieiev0/feed-templ/internal/types"
-import "fmt"
 
 templ Results(users []types.User, id string) {
 	for _, u := range users {
 		<div class="w-full bg-white border border-gray-200 rounded-lg my-5 shadow ">
 			<div class="flex flex-col items-center py-10">
 				<a href={ templ.SafeURL("/profile/" + u.Id) }>
-					<svg class="w-24 h-24 mb-3 rounded-full shadow-lg text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+					<div class="relative w-20 h-20 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+						<svg class="absolute w-24 h-24 text-gray-400 -left-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+					</div>
 				</a>
 				<a href={ templ.SafeURL("/profile/" + u.Id) }>
 					<h5 class="mb-1 text-xl font-medium text-gray-900 dark:text-white">{ u.Username }</h5>
 				</a>
-				<div class="mt-4 md:mt-6">
-					{ id }
-					if isAlreadySubscribed(u.Subscribers, id) {
-						@UnsubscribeButton(u.Id)
-					} else {
-						@SubscribeButton(u.Id)
-					}
-				</div>
+				@Subscription(u, id)
 			</div>
 		</div>
 	}
 }
 
+templ Subscription(u types.User, id string) {
+	<div class="mt-4 md:mt-6">
+		if isAlreadySubscribed(u.Subscribers, id) {
+			@UnsubscribeButton(u.Id)
+		} else {
+			@SubscribeButton(u.Id)
+		}
+	</div>
+}
+
 templ SubscribeButton(id string) {
-	<button hx-post={ "/subscribe/" + id } class="rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
+	<button hx-post={ "/subscribe/" + id } class="rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600" hx-swap="outerHTML">
 		Subscribe 
 	</button>
 }
 
 templ UnsubscribeButton(id string) {
-	<button hx-post={ "/unsubscribe/" + id } class="rounded-md bg-transparent px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
-		Subscribed 
+	<button hx-post={ "/unsubscribe/" + id } class="rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600" hx-swap="outerHTML">
+		Unsubscribe 
 	</button>
 }
 
 func isAlreadySubscribed(subs []types.UserBase, id string) bool {
-	fmt.Println("------")
-	fmt.Println(subs)
-	fmt.Println(id)
 	for _, s := range subs {
 		if s.Id == id {
 			return true

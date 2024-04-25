@@ -1,0 +1,54 @@
+package profile
+
+import "github.com/Alieksieiev0/feed-templ/internal/types"
+import "github.com/Alieksieiev0/feed-templ/internal/view/search"
+import "fmt"
+import "github.com/Alieksieiev0/feed-templ/internal/view/feed"
+
+templ Card(user types.User, id string, posts []types.Post) {
+	<div class="flex space-x-2 w-max rounded-xl shadow-xl overflow-hidden mx-auto pt-8">
+		<div
+			class="card min-w-sm bg-clip-border border bg-white hover:shadow-xl min-w-max"
+		>
+			<div class="w-full card__media"><img src="https://image.freepik.com/free-vector/abstract-binary-code-techno-background_1048-12836.jpg" class="h-48 w-96"/></div>
+			<div class="  card__media--aside "></div>
+			<div class="flex items-center p-4">
+				<div class="relative flex flex-col items-center w-full">
+					<div class="relative w-20 h-20 overflow-hidden -top-16 bg-gray-100 items-end justify-end rounded-full dark:bg-gray-600">
+						<svg class="absolute w-24 h-24 text-gray-400 -left-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+					</div>
+					<div class="flex flex-col space-y-1 justify-center items-center -mt-12 w-full">
+						<span class="text-md whitespace-nowrap text-gray-800 font-semibold">{ user.Username }</span>
+						<div class="py-2 flex space-x-2">
+							if user.Id != id {
+								@search.Subscription(user, id)
+							}
+						</div>
+						<div
+							class="py-4 flex justify-center items-center w-full divide-x divide-gray-400 divide-solid"
+						>
+							<span class="text-center px-2">
+								<span class="font-bold text-gray-700">{ fmt.Sprint(len(user.Subscribers)) }</span>
+								<span class="text-gray-600">Subscirbers</span>
+							</span>
+							<span class="text-center px-2">
+								<span class="font-bold text-gray-700">{ fmt.Sprint(len(user.Posts)) }</span>
+								<span class="text-gray-600">Posts</span>
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="w-1/3 mx-auto py-8">
+		<div id="feed">
+			<div id="posts">
+				@feed.Posts(posts)
+			</div>
+			if len(posts) >= 10 {
+				@feed.LoadMore("/posts?user_id=" + user.Id)
+			}
+		</div>
+	</div>
+}

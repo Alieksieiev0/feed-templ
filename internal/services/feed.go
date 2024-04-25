@@ -10,15 +10,17 @@ import (
 )
 
 const (
-	postsURL     = "/api/feed/posts"
-	postURL      = "/api/feed/users/%s/posts"
-	subscribeURL = "/api/feed/users/%s/subscribers"
+	postsURL       = "/api/feed/posts"
+	postURL        = "/api/feed/users/%s/posts"
+	subscribeURL   = "/api/feed/users/%s/subscribers"
+	unsubscribeURL = "/api/feed/users/%s/subscribers"
 )
 
 type FeedService interface {
 	GetPosts(c context.Context, params ...Param) ([]types.Post, *Response)
 	Post(c context.Context, id, token string, post *types.Post) *Response
 	Subscribe(c context.Context, id, subId, token string) *Response
+	Unsubscribe(c context.Context, id, subId, token string) *Response
 }
 
 func NewFeedService(addr string) FeedService {
@@ -71,6 +73,9 @@ func (fs *feedService) Post(c context.Context, id, token string, post *types.Pos
 }
 
 func (fs *feedService) Subscribe(c context.Context, id, subId, token string) *Response {
+	fmt.Println("^^^^")
+	fmt.Println(id)
+	fmt.Println(subId)
 	req, err := createRequest(
 		c,
 		http.MethodPut,
@@ -80,6 +85,23 @@ func (fs *feedService) Subscribe(c context.Context, id, subId, token string) *Re
 	if err != nil {
 		return NewResponse(fiber.StatusInternalServerError, err)
 	}
+	return fs.sendSubscriptionRequest(req, token)
+}
+
+func (fs *feedService) Unsubscribe(c context.Context, id, subId, token string) *Response {
+	req, err := createRequest(
+		c,
+		http.MethodDelete,
+		fs.addr+fmt.Sprintf(unsubscribeURL, id),
+		&types.UserBase{Id: subId},
+	)
+	if err != nil {
+		return NewResponse(fiber.StatusInternalServerError, err)
+	}
+	return fs.sendSubscriptionRequest(req, token)
+}
+
+func (fs *feedService) sendSubscriptionRequest(req *http.Request, token string) *Response {
 	req.Header.Add("Authorization", token)
 
 	resp, err := http.DefaultClient.Do(req)

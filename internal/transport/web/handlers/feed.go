@@ -96,7 +96,27 @@ func SubscribeHandler(serv services.FeedService) fiber.Handler {
 			return r.SendError(c)
 		}
 
-		return Render(c, search.UnsubscribeButton(subId), templ.WithStatus(r.StatusCode))
+		return Render(c, search.UnsubscribeButton(id), templ.WithStatus(r.StatusCode))
+	}
+}
+
+func UnsubscribeHandler(serv services.FeedService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		subId := c.Cookies("id")
+		jwt := c.Cookies("jwt")
+		id := c.Params("id")
+
+		r := serv.Unsubscribe(c.Context(), id, subId, jwt)
+		if r.StatusCode == fiber.StatusUnauthorized {
+			redirectToAuth(c, r)
+			return nil
+		}
+
+		if r.Err != nil {
+			return r.SendError(c)
+		}
+
+		return Render(c, search.SubscribeButton(id), templ.WithStatus(r.StatusCode))
 	}
 }
 

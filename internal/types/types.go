@@ -7,6 +7,7 @@ import (
 const (
 	subscriptionType = "subscription"
 	postType         = "post"
+	newStatus        = "NEW"
 )
 
 type UserToken struct {
@@ -63,4 +64,8 @@ func (n Notification) Message() string {
 		return "subscribed to you."
 	}
 	return ""
+}
+
+func (n Notification) IsNew() bool {
+	return n.Status == newStatus
 }

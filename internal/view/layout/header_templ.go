@@ -25,7 +25,7 @@ func header(isLoggedIn bool) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav class=\"bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800\"><div class=\"flex flex-wrap justify-between items-center mx-auto max-w-screen-xl\"><a href=\"/\" class=\"flex items-center\"><img src=\"https://flowbite.com/docs/images/logo.svg\" class=\"mr-3 h-6 sm:h-9\" alt=\"GoFeed Logo\"> <span class=\"self-center text-xl font-semibold whitespace-nowrap dark:text-white\">GoFeed</span></a><div class=\"justify-between items-center flex w-auto\"><ul id=\"pages\" class=\"flex font-medium flex-row space-x-8\"><li><a href=\"/\" class=\"py-2 pr-4 pl-4\">Home</a></li><li><a href=\"/search\" class=\"py-2 pr-4 pl-4\">Search</a></li></ul></div><div class=\"flex items-center \">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><nav class=\"bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800\"><div class=\"flex flex-wrap justify-between items-center mx-auto max-w-screen-2xl\"><a href=\"/\" class=\"flex items-center w-1/5\"><img src=\"https://flowbite.com/docs/images/logo.svg\" class=\"mr-3 h-6 sm:h-9\" alt=\"GoFeed Logo\"> <span class=\"self-center text-xl font-semibold whitespace-nowrap dark:text-white\">GoFeed</span></a><div class=\"justify-center flex mx-auto w-1/4\"><ul id=\"pages\" class=\"flex font-medium flex-row space-x-8\"><li><a href=\"/\" class=\"py-2 pr-4 pl-4\">Home</a></li><li><a href=\"/search\" class=\"py-2 pr-4 pl-4\">Search</a></li></ul></div><div class=\"flex items-center w-1/5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
