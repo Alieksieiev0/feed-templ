@@ -1,6 +1,6 @@
 # Project feed-templ
 
-Feed Templ contains the frontend of the Feed project.
+Feed Templ contains code for the GoFeed website.
 It uses HTMX, Templ and Go to display and dynamically replace data on the website.
 
 ## Getting Started
