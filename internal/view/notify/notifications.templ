@@ -9,9 +9,10 @@ script observeNotifications() {
             return;
         }
         const parent = el.parentNode;
-        if (parent.childElemntCount <= 10) {
+        if (parent.childElementCount <= 10) {
             return
         }
+
         parent.removeChild(parent.lastChild);
     });
 }
@@ -47,11 +48,6 @@ templ Notifications(notifications []types.Notification) {
 				@Notification(n)
 			}
 		}
-		/*
-		<a href="/user-notifications" class="flex w-full justify-center text-lg rounded-md bg-primary-600 py-2 font-semibold leading-6 text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600">
-			View All 
-		</a>
-        */
 	</div>
 }
 
@@ -99,9 +95,9 @@ templ Notification(notification types.Notification) {
 		<button
 			type="button"
 			hx-put={ "/notifications/review/" + notification.Id }
-			class="rounded-md p-2 inline-flex items-center justify-center text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-			hx-target="notifications"
+			hx-target="#notifications"
 			hx-swap="outerHTML"
+			class="rounded-md p-2 inline-flex items-center justify-center text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
 		>
 			<span class="sr-only"></span>
 			<svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">

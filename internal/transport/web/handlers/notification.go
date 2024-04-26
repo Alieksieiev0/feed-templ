@@ -103,6 +103,7 @@ func ListenHandler(serv services.NotificationService) fiber.Handler {
 
 func ReviewHandler(serv services.NotificationService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		fmt.Println(11111)
 		id := c.Params("id")
 		r := serv.Review(c.Context(), id)
 		if r.Err != nil {

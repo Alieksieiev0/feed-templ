@@ -14,21 +14,22 @@ import "github.com/Alieksieiev0/feed-templ/internal/types"
 
 func observeNotifications() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_observeNotifications_934c`,
-		Function: `function __templ_observeNotifications_934c(){document.body.addEventListener('htmx:load', function(evt) {
+		Name: `__templ_observeNotifications_f3b2`,
+		Function: `function __templ_observeNotifications_f3b2(){document.body.addEventListener('htmx:load', function(evt) {
         const el = evt.detail.elt;
         if (!el.id.includes("notification-")) {
             return;
         }
         const parent = el.parentNode;
-        if (parent.childElemntCount <= 10) {
+        if (parent.childElementCount <= 10) {
             return
         }
+
         parent.removeChild(parent.lastChild);
     });
 }`,
-		Call:       templ.SafeScript(`__templ_observeNotifications_934c`),
-		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_934c`),
+		Call:       templ.SafeScript(`__templ_observeNotifications_f3b2`),
+		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_f3b2`),
 	}
 }
 
@@ -132,7 +133,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("notification-" + notification.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 70, Col: 40}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 66, Col: 40}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -154,7 +155,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(notification.FromName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 78, Col: 131}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 74, Col: 131}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -167,7 +168,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(notification.Message())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 78, Col: 169}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 74, Col: 169}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -180,7 +181,7 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(notification.CreatedAt.Format("January 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 96, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 92, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -193,13 +194,13 @@ func Notification(notification types.Notification) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs("/notifications/review/" + notification.Id)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 101, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/notify/notifications.templ`, Line: 97, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" class=\"rounded-md p-2 inline-flex items-center justify-center text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500\" hx-target=\"notifications\" hx-swap=\"outerHTML\"><span class=\"sr-only\"></span> <svg class=\"h-6 w-6\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-target=\"#notifications\" hx-swap=\"outerHTML\" class=\"rounded-md p-2 inline-flex items-center justify-center text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500\"><span class=\"sr-only\"></span> <svg class=\"h-6 w-6\" xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\" aria-hidden=\"true\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
