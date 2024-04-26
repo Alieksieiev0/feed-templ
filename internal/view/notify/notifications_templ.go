@@ -14,8 +14,8 @@ import "github.com/Alieksieiev0/feed-templ/internal/types"
 
 func observeNotifications() templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_observeNotifications_6ef2`,
-		Function: `function __templ_observeNotifications_6ef2(){document.body.addEventListener('htmx:load', function(evt) {
+		Name: `__templ_observeNotifications_7c21`,
+		Function: `function __templ_observeNotifications_7c21(){document.body.addEventListener('htmx:load', function(evt) {
         const el = evt.detail.elt;
         if (!el.id.includes("notification-")) {
             return;
@@ -24,7 +24,7 @@ func observeNotifications() templ.ComponentScript {
 
         const parent = el.parentNode;
         if (parent.childElementCount <= 10 && parent.childElementCount > 0) {
-            const emptyMsg := document.querySelector("#empty-message")
+            const emptyMsg = document.querySelector("#empty-message")
             if (!emptyMsg.classList.contains("hidden")) {
                 emptyMsg.classList.add("hidden")
             }
@@ -34,8 +34,8 @@ func observeNotifications() templ.ComponentScript {
         parent.removeChild(parent.lastChild);
     });
 }`,
-		Call:       templ.SafeScript(`__templ_observeNotifications_6ef2`),
-		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_6ef2`),
+		Call:       templ.SafeScript(`__templ_observeNotifications_7c21`),
+		CallInline: templ.SafeScriptInline(`__templ_observeNotifications_7c21`),
 	}
 }
 

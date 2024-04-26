@@ -12,7 +12,7 @@ script observeNotifications() {
 
         const parent = el.parentNode;
         if (parent.childElementCount <= 10 && parent.childElementCount > 0) {
-            const emptyMsg := document.querySelector("#empty-message")
+            const emptyMsg = document.querySelector("#empty-message")
             if (!emptyMsg.classList.contains("hidden")) {
                 emptyMsg.classList.add("hidden")
             }
