@@ -46,7 +46,7 @@ templ Post(post types.Post) {
 				</a>
 				<div class="flex flex-col">
 					<div class="flex items-center">
-						<a class="inline-block text-lg font-bold mr-2" href={ templ.SafeURL("/users/" + post.OwnerId) }>{ post.OwnerName }</a>
+						<a class="inline-block text-lg font-bold mr-2" href={ templ.SafeURL("/profile/" + post.OwnerId) }>{ post.OwnerName }</a>
 					</div>
 					<div class="text-slate-500 dark:text-slate-300">
 						{ post.CreatedAt.Format("January 2, 2006") }
