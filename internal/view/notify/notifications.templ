@@ -8,8 +8,14 @@ script observeNotifications() {
         if (!el.id.includes("notification-")) {
             return;
         }
+
+
         const parent = el.parentNode;
-        if (parent.childElementCount <= 10) {
+        if (parent.childElementCount <= 10 && parent.childElementCount > 0) {
+            const emptyMsg := document.querySelector("#empty-message")
+            if (!emptyMsg.classList.contains("hidden")) {
+                emptyMsg.classList.add("hidden")
+            }
             return
         }
 
@@ -39,7 +45,7 @@ templ Menu() {
 templ Notifications(notifications []types.Notification) {
 	<div id="notifications">
 		if countNew(notifications) == 0 {
-			<div class="p-4 text-lg">
+			<div id="empty-message" class="p-4 text-lg">
 				You dont have any new notifications for today!
 			</div>
 		}
